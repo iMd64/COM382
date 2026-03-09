@@ -1,0 +1,2338 @@
+html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microprocessor Systems — Complete Study Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0a0c10;
+            --surface: #111318;
+            --surface2: #191d26;
+            --border: #252b38;
+            --accent: #4f8ef7;
+            --accent2: #34d399;
+            --accent3: #f59e0b;
+            --accent4: #f472b6;
+            --text: #e2e8f0;
+            --muted: #64748b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── TOP CHROME ── */
+        .top-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            height: 56px;
+            flex-shrink: 0;
+            gap: 1rem;
+            z-index: 50;
+        }
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        .logo span { color: #fff; }
+
+        /* Week tabs */
+        .week-tabs {
+            display: flex;
+            gap: 2px;
+            flex: 1;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .week-tabs::-webkit-scrollbar { display: none; }
+        .wtab {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.78rem;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            white-space: nowrap;
+            background: transparent;
+            color: var(--muted);
+            transition: all 0.18s;
+            letter-spacing: 0.03em;
+        }
+        .wtab:hover { background: var(--surface2); color: var(--text); border-color: var(--border); }
+        .wtab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+        /* ── LAYOUT ── */
+        .app-body { display: flex; flex: 1; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 230px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            flex-shrink: 0;
+            overflow-y: auto;
+            padding: 1rem 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        .sb-section-label {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--muted);
+            padding: 0.75rem 1.25rem 0.3rem;
+            text-transform: uppercase;
+        }
+        .sb-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 1.25rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.15s;
+            background: none;
+            border-right: none;
+            border-top: none;
+            border-bottom: none;
+            width: 100%;
+            text-align: left;
+        }
+        .sb-btn:hover { background: var(--surface2); color: var(--text); border-left-color: var(--border); }
+        .sb-btn.active { background: var(--surface2); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+        .sb-icon { font-size: 0.9rem; flex-shrink: 0; }
+
+        /* Main content */
+        .main-content { flex: 1; overflow-y: auto; padding: 2rem 2.5rem; }
+        .main-content::-webkit-scrollbar { width: 6px; }
+        .main-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* Views */
+        .week-view { display: none; }
+        .week-view.active { display: block; animation: fadeUp 0.3s ease; }
+        .section-view { display: none; }
+        .section-view.active { display: block; animation: fadeUp 0.25s ease; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── TYPOGRAPHY ── */
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 0.4rem;
+            line-height: 1.2;
+        }
+        .page-sub { color: var(--muted); font-size: 0.95rem; margin: 0 0 2rem; line-height: 1.6; max-width: 640px; }
+        h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: #fff; margin: 0 0 0.75rem; }
+        h4 { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.92rem; color: var(--accent); margin: 0 0 0.5rem; }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+        .card-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem; }
+        @media (max-width: 768px) { .card-2col { grid-template-columns: 1fr; } }
+
+        .badge {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+        .badge-blue { background: rgba(79,142,247,0.15); color: #93c5fd; border: 1px solid rgba(79,142,247,0.3); }
+        .badge-green { background: rgba(52,211,153,0.15); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.3); }
+        .badge-amber { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+        .badge-pink { background: rgba(244,114,182,0.15); color: #fbcfe8; border: 1px solid rgba(244,114,182,0.3); }
+        .badge-red { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+
+        /* Code blocks */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            color: #c9d1d9;
+        }
+        .kw { color: #ff79c6; }
+        .reg { color: #79c0ff; }
+        .lbl { color: #56d364; }
+        .cmt { color: #6e7681; }
+        .num { color: #f0883e; }
+
+        /* Interactive bits */
+        .bit-btn {
+            width: 52px; height: 56px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            background: var(--surface2);
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        .bit-btn:hover { border-color: var(--accent); }
+        .bit-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 12px rgba(79,142,247,0.4); }
+        .bit-label { font-size: 0.6rem; font-weight: 400; margin-top: 2px; opacity: 0.7; font-family: 'Inter', sans-serif; }
+
+        /* Memory map */
+        .mem-block {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 4px;
+        }
+        .mem-block:hover, .mem-block.sel { border-color: var(--accent); background: rgba(79,142,247,0.08); }
+
+        /* Toggle */
+        .toggle-wrap { display: flex; background: var(--surface2); border-radius: 8px; padding: 3px; gap: 2px; width: fit-content; margin-bottom: 1rem; }
+        .toggle-btn {
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: var(--muted);
+            border: none;
+            transition: all 0.15s;
+            font-family: 'Syne', sans-serif;
+        }
+        .toggle-btn.active { background: var(--accent); color: #fff; }
+
+        /* Stat row */
+        .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label { font-size: 0.82rem; color: var(--muted); }
+        .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; color: var(--accent2); font-weight: 700; }
+
+        /* Table */
+        .styled-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .styled-table th { background: var(--surface2); color: var(--muted); font-family: 'Syne', sans-serif; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.6rem 0.9rem; text-align: left; }
+        .styled-table td { padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--border); color: var(--text); }
+        .styled-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .styled-table code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--accent); }
+
+        /* Callout */
+        .callout { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 0.9rem 1rem; margin-bottom: 1rem; font-size: 0.83rem; line-height: 1.6; }
+        .callout-blue { border-color: var(--accent); background: rgba(79,142,247,0.07); color: #93c5fd; }
+        .callout-amber { border-color: var(--accent3); background: rgba(245,158,11,0.07); color: #fcd34d; }
+        .callout-green { border-color: var(--accent2); background: rgba(52,211,153,0.07); color: #6ee7b7; }
+        .callout-red { border-color: #f87171; background: rgba(248,113,113,0.07); color: #fca5a5; }
+
+        /* Input */
+        .calc-input {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            outline: none;
+            width: 100%;
+            transition: border-color 0.15s;
+        }
+        .calc-input:focus { border-color: var(--accent); }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 0.5rem 1.2rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-primary:hover { background: #6da4ff; }
+        .btn-ghost {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 0.5rem 1.2rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Decoder outputs */
+        .dec-out { border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); transition: all 0.2s; }
+        .dec-out.hot { border-color: #ef4444; background: rgba(239,68,68,0.15); color: #fca5a5; font-weight: 700; }
+
+        /* Stack items */
+        .stack-item { border-radius: 6px; padding: 0.5rem 0.75rem; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; margin-bottom: 3px; }
+        .stack-item-pc { background: rgba(79,142,247,0.15); border: 1px solid rgba(79,142,247,0.3); color: #93c5fd; }
+        .stack-item-reg { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; }
+        .stack-empty { color: var(--muted); font-size: 0.78rem; text-align: center; font-family: 'JetBrains Mono', monospace; padding: 1rem; }
+
+        /* Chart container */
+        .chart-wrap { position: relative; height: 280px; width: 100%; }
+
+        /* NEW: Fetch cycle step highlight */
+        .fetch-highlight { border-color: var(--accent) !important; background: rgba(79,142,247,0.12) !important; color: #93c5fd !important; }
+        .fetch-mem-hl { background: rgba(52,211,153,0.15) !important; color: #6ee7b7 !important; }
+
+        /* Sim TF flag pulse */
+        @keyframes tfPulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.6);} 70%{box-shadow:0 0 0 8px rgba(239,68,68,0);} }
+        .tf-active { animation: tfPulse 1s infinite; background: #ef4444 !important; color: #fff !important; border-color: #ef4444 !important; }
+
+        /* Interrupt type badge */
+        .ivec { font-family: 'JetBrains Mono', monospace; color: var(--accent2); font-weight: 700; }
+
+        /* Step timeline */
+        .timeline-step { position: relative; padding-left: 2rem; margin-bottom: 1.25rem; opacity: 0.3; transition: opacity 0.3s; }
+        .timeline-step.lit { opacity: 1; }
+        .timeline-dot { position: absolute; left: 0; top: 3px; width: 14px; height: 14px; border-radius: 50%; }
+        .timeline-line { position: absolute; left: 6px; top: 17px; bottom: -1.25rem; width: 2px; background: var(--border); }
+        .tl-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; margin-bottom: 3px; }
+        .tl-body { font-size: 0.8rem; color: #94a3b8; line-height: 1.5; }
+
+        /* Mobile sidebar */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .sidebar.mob-open { display: flex; position: fixed; top: 56px; left: 0; bottom: 0; z-index: 40; }
+            .main-content { padding: 1.25rem; }
+        }
+
+        /* Scrollable embed grid */
+        .embed-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+        .embed-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem; text-align: center; font-size: 0.8rem; color: var(--muted); }
+
+        /* Pin display */
+        .pin-contact { width: 28px; height: 10px; border-radius: 2px; background: #94a3b8; transition: background 0.15s; }
+        .pin-row { display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 1px 0; }
+        .pin-row:hover .pin-contact, .pin-row.sel .pin-contact { background: var(--accent3); }
+        .pin-row:hover .pin-text, .pin-row.sel .pin-text { color: var(--accent); }
+        .pin-text { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); white-space: nowrap; transition: color 0.15s; }
+
+        /* NEW concept highlights */
+        .new-tag { display: inline-block; background: rgba(244,114,182,0.2); color: var(--accent4); border: 1px solid rgba(244,114,182,0.3); border-radius: 4px; font-size: 0.6rem; font-weight: 700; padding: 1px 5px; vertical-align: middle; margin-left: 4px; font-family: 'Syne', sans-serif; letter-spacing: 0.05em; }
+
+        /* Switch */
+        .hw-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+        .hw-switch input { opacity: 0; width: 0; height: 0; }
+        .hw-slider { position: absolute; inset: 0; background: #374151; border-radius: 24px; transition: background 0.2s; cursor: pointer; }
+        .hw-slider:before { content:''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: transform 0.2s; }
+        .hw-switch input:checked + .hw-slider { background: var(--accent2); }
+        .hw-switch input:checked + .hw-slider:before { transform: translateX(20px); }
+    </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <div class="logo">MICRO<span>SYS</span></div>
+    <div class="week-tabs" id="weekTabs">
+        <button class="wtab active" data-week="w1">W1 — Core & 8051</button>
+        <button class="wtab" data-week="w4">W4 — Loops & Timing</button>
+        <button class="wtab" data-week="w56">W5–6 — Architecture</button>
+        <button class="wtab" data-week="w67a">W6–7 — Memory Lab</button>
+        <button class="wtab" data-week="w67b">W6–7 — Timers & IRQ</button>
+    </div>
+</div>
+
+<div class="app-body">
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<nav class="sidebar" id="sidebar">
+
+    <!-- W1 sidebar -->
+    <div class="sb-week-nav" data-for="w1">
+        <div class="sb-section-label">Week 1</div>
+        <button class="sb-btn active" data-sec="w1-core"><span class="sb-icon">⚡</span>Core Definitions</button>
+        <button class="sb-btn" data-sec="w1-arch"><span class="sb-icon">🏛</span>Architectures</button>
+        <button class="sb-btn" data-sec="w1-8051"><span class="sb-icon">🔲</span>The 8051 Family</button>
+        <button class="sb-btn" data-sec="w1-ops"><span class="sb-icon">🔄</span>CPU Operations</button>
+        <button class="sb-btn" data-sec="w1-select"><span class="sb-icon">📋</span>Selection Criteria</button>
+        <button class="sb-btn" data-sec="w1-pinout"><span class="sb-icon">📌</span>Pinout Explorer</button>
+        <button class="sb-btn" data-sec="w1-buses"><span class="sb-icon">🚌</span>Bus Architecture <span class="new-tag">NEW</span></button>
+    </div>
+
+    <!-- W4 sidebar -->
+    <div class="sb-week-nav" data-for="w4" style="display:none">
+        <div class="sb-section-label">Week 4</div>
+        <button class="sb-btn active" data-sec="w4-loops"><span class="sb-icon">🔁</span>Loops & DJNZ</button>
+        <button class="sb-btn" data-sec="w4-jumps"><span class="sb-icon">↗️</span>Jump Mechanics</button>
+        <button class="sb-btn" data-sec="w4-stack"><span class="sb-icon">📚</span>Stack & Subroutines</button>
+        <button class="sb-btn" data-sec="w4-timing"><span class="sb-icon">⏱</span>Timing & Delays</button>
+        <button class="sb-btn" data-sec="w4-io"><span class="sb-icon">🔌</span>I/O & Bit Logic</button>
+        <button class="sb-btn" data-sec="w4-16bit"><span class="sb-icon">🔢</span>16-bit Arithmetic <span class="new-tag">NEW</span></button>
+    </div>
+
+    <!-- W56 sidebar -->
+    <div class="sb-week-nav" data-for="w56" style="display:none">
+        <div class="sb-section-label">Week 5–6</div>
+        <button class="sb-btn active" data-sec="w56-hw"><span class="sb-icon">🖥</span>Hardware Overview</button>
+        <button class="sb-btn" data-sec="w56-mem"><span class="sb-icon">💾</span>Memory Map</button>
+        <button class="sb-btn" data-sec="w56-sfr"><span class="sb-icon">⚙️</span>SFRs & PSW</button>
+        <button class="sb-btn" data-sec="w56-timers"><span class="sb-icon">⏰</span>Timers</button>
+        <button class="sb-btn" data-sec="w56-irq"><span class="sb-icon">⚠️</span>Interrupts</button>
+        <button class="sb-btn" data-sec="w56-clab"><span class="sb-icon">💻</span>C Lab</button>
+        <button class="sb-btn" data-sec="w56-freq"><span class="sb-icon">📡</span>Square Waves <span class="new-tag">NEW</span></button>
+    </div>
+
+    <!-- W67A sidebar -->
+    <div class="sb-week-nav" data-for="w67a" style="display:none">
+        <div class="sb-section-label">Week 6–7 (Memory)</div>
+        <button class="sb-btn active" data-sec="w67a-basics"><span class="sb-icon">🧮</span>Memory Capacity</button>
+        <button class="sb-btn" data-sec="w67a-types"><span class="sb-icon">💿</span>Memory Types <span class="new-tag">NEW</span></button>
+        <button class="sb-btn" data-sec="w67a-decode"><span class="sb-icon">🔀</span>Address Decoding</button>
+        <button class="sb-btn" data-sec="w67a-ale"><span class="sb-icon">🔌</span>ALE Multiplexing</button>
+        <button class="sb-btn" data-sec="w67a-ea"><span class="sb-icon">📍</span>EA Pin & Maps</button>
+        <button class="sb-btn" data-sec="w67a-movx"><span class="sb-icon">📦</span>MOVX Assembly</button>
+    </div>
+
+    <!-- W67B sidebar -->
+    <div class="sb-week-nav" data-for="w67b" style="display:none">
+        <div class="sb-section-label">Week 6–7 (IRQ)</div>
+        <button class="sb-btn active" data-sec="w67b-mem"><span class="sb-icon">💾</span>Memory & SFRs</button>
+        <button class="sb-btn" data-sec="w67b-timing"><span class="sb-icon">⏱</span>Core Timing</button>
+        <button class="sb-btn" data-sec="w67b-tmod"><span class="sb-icon">⚙️</span>Timer Config</button>
+        <button class="sb-btn" data-sec="w67b-irq"><span class="sb-icon">⚠️</span>Interrupts</button>
+        <button class="sb-btn" data-sec="w67b-scenario"><span class="sb-icon">🚨</span>Alarm Scenario</button>
+        <button class="sb-btn" data-sec="w67b-itypes"><span class="sb-icon">🔀</span>IT0/IT1 Trigger <span class="new-tag">NEW</span></button>
+    </div>
+
+</nav>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<main class="main-content" id="mainContent">
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║           WEEK 1                ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="week-view active" id="wk-w1">
+
+    <!-- W1: Core Definitions -->
+    <div class="section-view active" id="w1-core">
+        <div class="page-title">Core Definitions</div>
+        <p class="page-sub">The foundation: comparing Microprocessors, Microcontrollers, and where Embedded Systems fit.</p>
+
+        <div class="card-2col">
+            <div class="card">
+                <h3>Microprocessor (μP)</h3>
+                <p style="font-size:0.83rem;color:#94a3b8;margin:0 0 1rem">A CPU on a single chip — ALU, registers, and control unit.</p>
+                <div class="stat-row"><span class="stat-label">System needs</span><span style="font-size:0.78rem;color:#fcd34d">External RAM + ROM + I/O</span></div>
+                <div class="stat-row"><span class="stat-label">Memory ratio</span><span style="font-size:0.78rem;color:#fcd34d">RAM &gt; ROM</span></div>
+                <div class="stat-row"><span class="stat-label">Speed</span><span class="stat-val">Up to 4 GHz</span></div>
+                <div class="stat-row"><span class="stat-label">Power</span><span style="color:#f87171;font-family:'JetBrains Mono';font-size:0.85rem">High</span></div>
+                <div class="stat-row"><span class="stat-label">Cost</span><span style="color:#f87171;font-family:'JetBrains Mono';font-size:0.85rem">High</span></div>
+                <div class="stat-row"><span class="stat-label">Example use</span><span style="font-size:0.78rem;color:#94a3b8">Desktops, Servers</span></div>
+            </div>
+            <div class="card">
+                <h3>Microcontroller (μC)</h3>
+                <p style="font-size:0.83rem;color:#94a3b8;margin:0 0 1rem">An entire computer on a single silicon chip — CPU + RAM + ROM + I/O.</p>
+                <div class="stat-row"><span class="stat-label">System needs</span><span style="font-size:0.78rem;color:var(--accent2)">Everything on-chip</span></div>
+                <div class="stat-row"><span class="stat-label">Memory ratio</span><span style="font-size:0.78rem;color:var(--accent2)">ROM &gt; RAM</span></div>
+                <div class="stat-row"><span class="stat-label">Speed</span><span class="stat-val">≤ 200 MHz</span></div>
+                <div class="stat-row"><span class="stat-label">Power</span><span style="color:#6ee7b7;font-family:'JetBrains Mono';font-size:0.85rem">Low</span></div>
+                <div class="stat-row"><span class="stat-label">Cost</span><span style="color:#6ee7b7;font-family:'JetBrains Mono';font-size:0.85rem">Very Low</span></div>
+                <div class="stat-row"><span class="stat-label">Example use</span><span style="font-size:0.78rem;color:#94a3b8">Appliances, sensors</span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Embedded Systems</h3>
+            <p style="font-size:0.83rem;color:#94a3b8;margin:0 0 1rem">Closely integrated with a host system. Uses a μC to do <strong style="color:#fff">one task only</strong>. Software is burned into ROM and rarely changes.</p>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem" id="embedCatBtns">
+                <button class="btn-primary" onclick="showEmbed('home',this)">🏠 Home</button>
+                <button class="btn-ghost" onclick="showEmbed('auto',this)">🚗 Auto</button>
+                <button class="btn-ghost" onclick="showEmbed('office',this)">🏢 Office</button>
+                <button class="btn-ghost" onclick="showEmbed('medical',this)">⚕️ Medical</button>
+            </div>
+            <div id="embed-home" class="embed-grid">
+                <div class="embed-item">Microwave Ovens</div><div class="embed-item">TVs & Remotes</div>
+                <div class="embed-item">Security Systems</div><div class="embed-item">Sewing Machines</div>
+            </div>
+            <div id="embed-auto" class="embed-grid" style="display:none">
+                <div class="embed-item">Engine Control</div><div class="embed-item">Air Bags</div>
+                <div class="embed-item">ABS Brakes</div><div class="embed-item">Trip Computers</div>
+            </div>
+            <div id="embed-office" class="embed-grid" style="display:none">
+                <div class="embed-item">Printers</div><div class="embed-item">Fax Machines</div>
+                <div class="embed-item">Copiers</div><div class="embed-item">Intercoms</div>
+            </div>
+            <div id="embed-medical" class="embed-grid" style="display:none">
+                <div class="embed-item">Pacemakers</div><div class="embed-item">Blood Glucose Meters</div>
+                <div class="embed-item">MRI Machines</div><div class="embed-item">Infusion Pumps</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W1: Architectures -->
+    <div class="section-view" id="w1-arch">
+        <div class="page-title">Computer Architectures</div>
+        <p class="page-sub">How the CPU accesses memory defines the architecture. Harvard vs. Princeton (Von-Neumann).</p>
+
+        <div class="card" style="margin-bottom:1.5rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem">
+                <h3 style="margin:0" id="archTitle">Harvard Architecture</h3>
+                <div class="toggle-wrap">
+                    <button class="toggle-btn active" id="btnHarvard" onclick="showArch('harvard')">Harvard</button>
+                    <button class="toggle-btn" id="btnPrinceton" onclick="showArch('princeton')">Princeton</button>
+                </div>
+            </div>
+            <p id="archDesc" style="font-size:0.83rem;color:#94a3b8;margin-bottom:1.5rem">Uses <strong style="color:#fff">separate</strong> memory and buses for Code and Data. CPU can fetch both simultaneously — faster.</p>
+
+            <!-- Visual diagram -->
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+                <div style="background:var(--accent);color:#fff;border-radius:8px;padding:1rem 1.25rem;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;text-align:center;min-width:90px">CPU<br><span style="font-weight:400;font-size:0.72rem;opacity:0.8">ALU + CU</span></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:0.5rem">
+                    <div id="archBus1" style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.35rem 0.6rem;font-family:'JetBrains Mono';font-size:0.72rem;color:var(--accent);text-align:center">Instruction Bus</div>
+                    <div id="archBus2" style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.35rem 0.6rem;font-family:'JetBrains Mono';font-size:0.72rem;color:var(--accent2);text-align:center">Data Bus</div>
+                </div>
+                <div id="archMems" style="display:flex;flex-direction:column;gap:0.5rem">
+                    <div id="archMemInst" style="background:rgba(79,142,247,0.15);border:1px solid rgba(79,142,247,0.3);border-radius:6px;padding:0.6rem 0.8rem;font-size:0.78rem;color:#93c5fd;text-align:center">Instruction<br>Memory (ROM)</div>
+                    <div id="archMemData" style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);border-radius:6px;padding:0.6rem 0.8rem;font-size:0.78rem;color:#6ee7b7;text-align:center">Data<br>Memory (RAM)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Popular 8-bit MCUs</h3>
+            <table class="styled-table">
+                <thead><tr><th>MCU</th><th>Architecture</th><th>Key Feature</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Intel 8051</strong></td><td><span class="badge badge-blue">Harvard</span></td><td>12 clocks/cycle, direct RAM access, 128B stack</td></tr>
+                    <tr><td><strong>ATMEL AVR</strong></td><td><span class="badge badge-blue">Harvard</span></td><td>Single clock/cycle, on-chip flash (Arduino brain)</td></tr>
+                    <tr><td><strong>Microchip PIC</strong></td><td><span class="badge badge-blue">Harvard</span></td><td>Bank switching for RAM, very limited stack</td></tr>
+                    <tr><td><strong>Motorola 6811</strong></td><td><span class="badge badge-green">Princeton</span></td><td>Shared memory bus</td></tr>
+                    <tr><td><strong>ARM2 (RISC)</strong></td><td><span class="badge badge-green">Princeton</span></td><td>Single cycle, fast compute, many ADCs/timers</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- W1: 8051 Family -->
+    <div class="section-view" id="w1-8051">
+        <div class="page-title">The 8051 Family</div>
+        <p class="page-sub">Introduced by Intel in 1981. An 8-bit Harvard System-on-a-Chip.</p>
+
+        <div class="card-2col">
+            <div class="card">
+                <h3>Core 8051 Features</h3>
+                <div class="stat-row"><span class="stat-label">ROM (Code)</span><span class="stat-val">4 KB</span></div>
+                <div class="stat-row"><span class="stat-label">RAM (Data)</span><span class="stat-val">128 Bytes</span></div>
+                <div class="stat-row"><span class="stat-label">I/O Ports</span><span class="stat-val">4 × 8-bit = 32 pins</span></div>
+                <div class="stat-row"><span class="stat-label">16-bit Timers</span><span class="stat-val">2 (T0, T1)</span></div>
+                <div class="stat-row"><span class="stat-label">Interrupts</span><span class="stat-val">6 sources</span></div>
+                <div class="stat-row"><span class="stat-label">Serial Port</span><span class="stat-val">1 (RXD / TXD)</span></div>
+                <div style="margin-top:1rem">
+                    <div class="callout callout-blue">
+                        <strong>PSEN</strong> pin enables Code Memory (ROM).<br>
+                        <strong>RD / WR</strong> pins enable Data Memory (RAM).
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Family Comparison</h3>
+                <table class="styled-table">
+                    <thead><tr><th>Feature</th><th>8031</th><th>8051</th><th>8052</th></tr></thead>
+                    <tbody>
+                        <tr><td>ROM</td><td style="color:#f87171">0 KB</td><td>4 KB</td><td>8 KB</td></tr>
+                        <tr><td>RAM</td><td>128 B</td><td>128 B</td><td>256 B</td></tr>
+                        <tr><td>Timers</td><td>2</td><td>2</td><td>3</td></tr>
+                        <tr><td>Interrupts</td><td>6</td><td>6</td><td>8</td></tr>
+                    </tbody>
+                </table>
+                <div class="callout callout-amber" style="margin-top:1rem">
+                    The <strong>8031</strong> has no internal ROM. It must always use external ROM (EA tied to GND).
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>ROM Technologies (Prefix Guide)</h3>
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem" id="romBtns">
+                <button class="btn-primary" onclick="showRom('mask',this)">80xx — Mask ROM</button>
+                <button class="btn-ghost" onclick="showRom('uveprom',this)">87xx — UV-EPROM</button>
+                <button class="btn-ghost" onclick="showRom('flash',this)">89xx — Flash</button>
+                <button class="btn-ghost" onclick="showRom('nvram',this)">DS5000 — NV-RAM</button>
+            </div>
+            <div id="romDetail" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1.25rem">
+                <div id="romContent">
+                    <h4>80xx — Mask ROM (Factory Programmed)</h4>
+                    <p style="font-size:0.83rem;color:#94a3b8">Programmed permanently at the factory using photolithographic masks. Cannot be erased or reprogrammed. Used in high-volume production where the firmware is final.</p>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.75rem">
+                        <span class="badge badge-green">✓ Cheapest in volume</span>
+                        <span class="badge badge-red">✗ Permanent</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W1: CPU Operations -->
+    <div class="section-view" id="w1-ops">
+        <div class="page-title">CPU Operations</div>
+        <p class="page-sub">The Opcode Fetch Cycle and Machine Cycle timing.</p>
+
+        <div class="card" style="margin-bottom:1.5rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.25rem">
+                <h3 style="margin:0">The Opcode Fetch Cycle</h3>
+                <button class="btn-primary" id="fetchBtn" onclick="stepFetch()">▶ Step 1</button>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+                <div id="fCpu" style="background:var(--surface2);border:2px solid var(--border);border-radius:8px;padding:1rem;text-align:center;transition:all 0.2s">
+                    <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:0.5rem">CPU</div>
+                    <div id="fPC" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:0.3rem 0.5rem;font-family:'JetBrains Mono';font-size:0.72rem;margin-bottom:0.35rem;transition:all 0.2s">PC: 0x0042</div>
+                    <div id="fIR" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:0.3rem 0.5rem;font-family:'JetBrains Mono';font-size:0.72rem;transition:all 0.2s">IR: empty</div>
+                </div>
+                <div style="display:flex;flex-direction:column;justify-content:space-around;gap:0.4rem">
+                    <div id="fABus" style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.3rem;font-size:0.7rem;text-align:center;transition:all 0.2s;color:var(--muted)">Address Bus</div>
+                    <div id="fCBus" style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.3rem;font-size:0.7rem;text-align:center;transition:all 0.2s;color:var(--muted)">Control Bus</div>
+                    <div id="fDBus" style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.3rem;font-size:0.7rem;text-align:center;transition:all 0.2s;color:var(--muted)">Data Bus</div>
+                </div>
+                <div id="fMem" style="background:var(--surface2);border:2px solid var(--border);border-radius:8px;padding:1rem;text-align:center;transition:all 0.2s">
+                    <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:0.5rem">ROM</div>
+                    <div style="font-family:'JetBrains Mono';font-size:0.68rem;color:var(--muted)">0041: ...</div>
+                    <div id="fMemTarget" style="font-family:'JetBrains Mono';font-size:0.72rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.4rem;margin:2px 0;transition:all 0.2s">0042: MOV A, #5</div>
+                    <div style="font-family:'JetBrains Mono';font-size:0.68rem;color:var(--muted)">0043: ...</div>
+                </div>
+            </div>
+            <div id="fetchDesc" class="callout callout-blue">Click "Step 1" to begin the Opcode Fetch Cycle.</div>
+        </div>
+
+        <div class="card-2col">
+            <div class="card">
+                <h3>Machine Cycle Calculator</h3>
+                <p style="font-size:0.8rem;color:#94a3b8;margin-bottom:1rem">1 MC = 6 States = 12 Oscillator Clock Cycles</p>
+                <div style="margin-bottom:0.75rem">
+                    <label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:0.3rem">Crystal Frequency (MHz)</label>
+                    <input class="calc-input" id="mcFreq" type="number" value="12" oninput="calcMC()">
+                </div>
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem">
+                    <div class="stat-row"><span class="stat-label">Clock Period (T<sub>osc</sub>)</span><span id="mcTosc" class="stat-val">0.083 µs</span></div>
+                    <div class="stat-row"><span class="stat-label">Machine Cycle Time</span><span id="mcTime" style="font-family:'JetBrains Mono';font-size:1rem;color:var(--accent3);font-weight:700">1.000 µs</span></div>
+                </div>
+            </div>
+            <div class="card" style="background:#0d1117">
+                <h3 style="color:var(--accent2)">3-Input NAND in Assembly</h3>
+                <p style="font-size:0.72rem;color:var(--muted);margin-bottom:0.75rem;font-family:'JetBrains Mono'">P1.7 = NOT(P1.4 AND P1.5 AND P1.6)</p>
+                <div class="code-block">
+<span class="lbl">LOOP:</span>
+  <span class="kw">MOV</span>  <span class="reg">C</span>, P1.4    <span class="cmt">; Read P1.4 → Carry</span>
+  <span class="kw">ANL</span>  <span class="reg">C</span>, P1.5    <span class="cmt">; AND with P1.5</span>
+  <span class="kw">ANL</span>  <span class="reg">C</span>, P1.6    <span class="cmt">; AND with P1.6</span>
+  <span class="kw">CPL</span>  <span class="reg">C</span>          <span class="cmt">; Complement (NOT)</span>
+  <span class="kw">MOV</span>  P1.7, <span class="reg">C</span>  <span class="cmt">; Output to P1.7</span>
+  <span class="kw">SJMP</span> <span class="lbl">LOOP</span>      <span class="cmt">; Loop forever</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W1: Selection Criteria -->
+    <div class="section-view" id="w1-select">
+        <div class="page-title">Selection Criteria & Vendors</div>
+        <p class="page-sub">Choosing the right microcontroller: balance compute needs, cost, and availability.</p>
+        <div class="card-grid">
+            <div class="card"><h4>⏱ Speed & Power</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">Ensure processor speed meets the application without excessive power draw. Critical for battery devices.</p></div>
+            <div class="card"><h4>💾 RAM / ROM Size</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">Evaluate on-chip RAM for data and Flash/ROM for storing code. Consider if external memory is needed.</p></div>
+            <div class="card"><h4>🔌 I/O & Peripherals</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">Count required pins, timers, ADCs, and serial interfaces (UART, SPI, I2C) for your sensors/actuators.</p></div>
+            <div class="card"><h4>🛠 Dev Tools</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">Quality of compilers, assemblers, debuggers, and IDEs. Poor tooling kills productivity.</p></div>
+            <div class="card"><h4>📦 Packaging & Supply</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">Choose a package (DIP, TQFP, QFN) suitable for your PCB. Ensure reliable long-term supply chain.</p></div>
+            <div class="card"><h4>💲 Cost Per Unit</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">Crucial for mass production. MCUs are cheaper than μPs as they need fewer external components.</p></div>
+            <div class="card"><h4>🔼 Upgradability</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">Ease of switching to a higher-performance or lower-power variant in the same family later.</p></div>
+        </div>
+        <div class="card">
+            <h3>Major 8051 Manufacturers</h3>
+            <p style="font-size:0.83rem;color:#94a3b8;margin-bottom:1rem">Intel released 8051 to secondary sources. Each vendor adds unique enhancements (built-in ADCs, faster cores, more memory).</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.6rem">
+                <div class="embed-item">Intel (Creator)</div><div class="embed-item">Atmel</div>
+                <div class="embed-item">Philips / NXP</div><div class="embed-item">Infineon</div>
+                <div class="embed-item">Dallas / Maxim</div><div class="embed-item">Silicon Labs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W1: Pinout -->
+    <div class="section-view" id="w1-pinout">
+        <div class="page-title">8051 Pinout Explorer</div>
+        <p class="page-sub">Classic 40-pin DIP package. Hover over a pin to see its function and alternate uses.</p>
+        <div style="display:grid;grid-template-columns:auto auto auto 1fr;gap:1rem;align-items:start">
+            <div id="pinsLeft" style="display:flex;flex-direction:column;gap:2px;margin-top:2rem"></div>
+            <div style="width:80px;background:#1e2430;border:2px solid #374151;border-radius:8px;min-height:500px;display:flex;align-items:center;justify-content:center;position:relative">
+                <div style="position:absolute;top:0;width:24px;height:12px;background:#111318;border-radius:0 0 12px 12px;border:1px solid #374151;left:50%;transform:translateX(-50%)"></div>
+                <span style="writing-mode:vertical-rl;font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#374151;letter-spacing:0.2em">8051</span>
+            </div>
+            <div id="pinsRight" style="display:flex;flex-direction:column;gap:2px;margin-top:2rem"></div>
+            <div class="card" style="margin:0">
+                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem">
+                    <div id="pinNumBadge" style="background:var(--accent3);color:#000;font-family:'JetBrains Mono';font-weight:700;font-size:1rem;padding:4px 10px;border-radius:6px">#1</div>
+                    <div id="pinNameDisplay" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem">P1.0</div>
+                </div>
+                <div id="pinAltWrap" style="margin-bottom:0.5rem">
+                    <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px">Alt Function</div>
+                    <span id="pinAlt" class="badge badge-amber"></span>
+                </div>
+                <div style="font-size:0.78rem;color:var(--muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Description</div>
+                <p id="pinDesc" style="font-size:0.83rem;color:#94a3b8;margin:0;min-height:60px">General purpose I/O pin on Port 1, Bit 0.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- W1 NEW: Bus Architecture -->
+    <div class="section-view" id="w1-buses">
+        <div class="page-title">Bus Architecture <span class="new-tag">ADDED</span></div>
+        <p class="page-sub">The three buses that connect the CPU to memory and peripherals — a key concept from the notes on internal CPU architecture.</p>
+        <div class="card-grid">
+            <div class="card" style="border-color:rgba(79,142,247,0.4)">
+                <h4 style="color:var(--accent)">📍 Address Bus</h4>
+                <p style="font-size:0.83rem;color:#94a3b8;margin:0 0 0.75rem">Unidirectional (CPU → memory/peripherals). Determines <em>where</em> data is to be read from or written to. The width determines the addressable memory range.</p>
+                <div class="stat-row"><span class="stat-label">8051 width</span><span class="stat-val">16-bit → 64 KB</span></div>
+                <div class="stat-row"><span class="stat-label">Direction</span><span style="font-family:'JetBrains Mono';font-size:0.8rem;color:#f0883e">CPU → Memory</span></div>
+            </div>
+            <div class="card" style="border-color:rgba(52,211,153,0.4)">
+                <h4 style="color:var(--accent2)">📦 Data Bus</h4>
+                <p style="font-size:0.83rem;color:#94a3b8;margin:0 0 0.75rem">Bidirectional. Carries the actual data being processed — instructions coming from ROM, data coming from/going to RAM.</p>
+                <div class="stat-row"><span class="stat-label">8051 width</span><span class="stat-val">8-bit</span></div>
+                <div class="stat-row"><span class="stat-label">Direction</span><span style="font-family:'JetBrains Mono';font-size:0.8rem;color:var(--accent2)">Bidirectional</span></div>
+            </div>
+            <div class="card" style="border-color:rgba(245,158,11,0.4)">
+                <h4 style="color:var(--accent3)">🎛 Control Bus</h4>
+                <p style="font-size:0.83rem;color:#94a3b8;margin:0 0 0.75rem">Carries command signals that coordinate all operations — RD/WR strobes, clock pulses, interrupt signals, ALE, PSEN, and reset.</p>
+                <div class="stat-row"><span class="stat-label">Key signals</span><span style="font-family:'JetBrains Mono';font-size:0.75rem;color:var(--accent3)">RD, WR, ALE, PSEN</span></div>
+                <div class="stat-row"><span class="stat-label">Direction</span><span style="font-family:'JetBrains Mono';font-size:0.8rem;color:var(--accent3)">CPU → Peripherals</span></div>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Internal CPU Architecture: EU + BIU</h3>
+            <p style="font-size:0.83rem;color:#94a3b8;margin-bottom:1rem">Modern processors pipeline two units to increase efficiency:</p>
+            <div class="card-2col">
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem">
+                    <h4>Execution Unit (EU)</h4>
+                    <p style="font-size:0.82rem;color:#94a3b8;margin:0">Contains the <strong style="color:#fff">ALU</strong>, flags, and general registers. Decodes and executes instructions. Requests data from the BIU.</p>
+                </div>
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem">
+                    <h4>Bus Interface Unit (BIU)</h4>
+                    <p style="font-size:0.82rem;color:#94a3b8;margin:0">Contains <strong style="color:#fff">segment registers, instruction pointer, and a queue</strong>. Fetches instructions from memory <em>ahead of time</em> so the EU never has to wait.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- end wk-w1 -->
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║           WEEK 4                ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="week-view" id="wk-w4">
+
+    <!-- W4: Loops -->
+    <div class="section-view active" id="w4-loops">
+        <div class="page-title">Loops & DJNZ</div>
+        <p class="page-sub">The primary looping instruction in 8051 assembly and how to handle counts beyond 256.</p>
+        <div class="card-2col">
+            <div class="card">
+                <h3>DJNZ — Decrement & Jump if Not Zero</h3>
+                <ul style="font-size:0.83rem;color:#94a3b8;line-height:1.8;padding-left:1.2rem;margin:0 0 1rem">
+                    <li>Decrements the specified register by 1</li>
+                    <li>If result ≠ 0 → jump to label</li>
+                    <li>If result = 0 → fall through to next instruction</li>
+                </ul>
+                <div class="callout callout-amber">
+                    <strong>Max iterations:</strong> 8-bit register max = 255 (FFH). If initialized to 0, first decrement wraps to 255 → <strong>256 iterations max</strong> per single loop.
+                </div>
+            </div>
+            <div class="card" style="background:#0d1117">
+                <h3 style="color:var(--accent2)">Nested Loop (700 iterations)</h3>
+                <div class="code-block">
+<span class="cmt">; Loop 700 times (10 × 70)</span>
+  <span class="kw">MOV</span>  <span class="reg">A</span>, #55H
+  <span class="kw">MOV</span>  <span class="reg">R3</span>, #10    <span class="cmt">; Outer = 10</span>
+<span class="lbl">NEXT:</span>
+  <span class="kw">MOV</span>  <span class="reg">R2</span>, #70    <span class="cmt">; Inner = 70</span>
+<span class="lbl">AGAIN:</span>
+  <span class="kw">CPL</span>  <span class="reg">A</span>
+  <span class="kw">DJNZ</span> <span class="reg">R2</span>, <span class="lbl">AGAIN</span>
+  <span class="kw">DJNZ</span> <span class="reg">R3</span>, <span class="lbl">NEXT</span>
+                </div>
+                <div class="code-block" style="margin-top:0.75rem">
+<span class="cmt">; Simple loop: Add 3 to A, 10 times</span>
+  <span class="kw">MOV</span>  <span class="reg">A</span>, #0
+  <span class="kw">MOV</span>  <span class="reg">R2</span>, #10
+<span class="lbl">AGAIN:</span>
+  <span class="kw">ADD</span>  <span class="reg">A</span>, #03
+  <span class="kw">DJNZ</span> <span class="reg">R2</span>, <span class="lbl">AGAIN</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W4: Jumps -->
+    <div class="section-view" id="w4-jumps">
+        <div class="page-title">Jump Mechanics</div>
+        <p class="page-sub">Conditional and unconditional jumps, and how short-jump addresses are calculated.</p>
+        <div class="card-2col">
+            <div>
+                <div class="card">
+                    <h3>Conditional Jumps (Short Jumps)</h3>
+                    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem">Target must be within –128 to +127 bytes of current PC.</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.8rem">
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.6rem"><code style="color:var(--accent);font-family:'JetBrains Mono'">JZ / JNZ</code><div style="color:#94a3b8;font-size:0.75rem;margin-top:2px">A is Zero / Not Zero</div></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.6rem"><code style="color:var(--accent);font-family:'JetBrains Mono'">JC / JNC</code><div style="color:#94a3b8;font-size:0.75rem;margin-top:2px">Carry is 1 / 0</div></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.6rem"><code style="color:var(--accent);font-family:'JetBrains Mono'">CJNE</code><div style="color:#94a3b8;font-size:0.75rem;margin-top:2px">Compare, Jump if ≠</div></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.6rem"><code style="color:var(--accent);font-family:'JetBrains Mono'">JB / JNB</code><div style="color:#94a3b8;font-size:0.75rem;margin-top:2px">Bit is 1 / 0</div></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.6rem col-span-2"><code style="color:var(--accent);font-family:'JetBrains Mono'">JBC</code><div style="color:#94a3b8;font-size:0.75rem;margin-top:2px">Bit is 1, then clear it</div></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.6rem"><code style="color:var(--accent);font-family:'JetBrains Mono'">DJNZ</code><div style="color:#94a3b8;font-size:0.75rem;margin-top:2px">Dec & Jump if ≠ 0</div></div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top:0">
+                    <h3>Unconditional Jumps</h3>
+                    <div class="stat-row"><span style="font-family:'JetBrains Mono';font-size:0.85rem;color:var(--accent2)">LJMP</span><span style="font-size:0.8rem;color:#94a3b8">3-byte. Any address in 64 KB</span></div>
+                    <div class="stat-row"><span style="font-family:'JetBrains Mono';font-size:0.85rem;color:var(--accent2)">SJMP</span><span style="font-size:0.8rem;color:#94a3b8">2-byte. –128 to +127 bytes</span></div>
+                </div>
+            </div>
+
+            <div class="card" style="background:#111827">
+                <h3 style="color:var(--accent3)">Short Jump Calculator</h3>
+                <p style="font-size:0.78rem;color:#94a3b8;margin-bottom:1rem;font-family:'JetBrains Mono'">Target = PC_next + rel_offset</p>
+                <div style="margin-bottom:0.75rem">
+                    <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:4px">PC of NEXT instruction (hex)</label>
+                    <div style="display:flex;align-items:center;gap:4px">
+                        <span style="font-family:'JetBrains Mono';color:var(--muted);font-size:0.82rem">0x</span>
+                        <input class="calc-input" id="jmpPC" value="0017" maxlength="4" style="text-transform:uppercase">
+                    </div>
+                </div>
+                <div style="margin-bottom:1rem">
+                    <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:4px">Relative address (hex byte, e.g. FE = -2)</label>
+                    <div style="display:flex;align-items:center;gap:4px">
+                        <span style="font-family:'JetBrains Mono';color:var(--muted);font-size:0.82rem">0x</span>
+                        <input class="calc-input" id="jmpRel" value="FE" maxlength="2" style="text-transform:uppercase">
+                    </div>
+                </div>
+                <button class="btn-primary" style="width:100%;margin-bottom:1rem" onclick="calcJump()">Calculate Target</button>
+                <div style="background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:1rem;display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-size:0.8rem;color:var(--muted)">Target PC:</span>
+                    <span id="jmpResult" style="font-family:'JetBrains Mono';font-size:1.3rem;font-weight:700;color:var(--accent2)">0x0015</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W4: Stack -->
+    <div class="section-view" id="w4-stack">
+        <div class="page-title">Stack & Subroutines</div>
+        <p class="page-sub">CALL, RET, PUSH, POP — and the LIFO stack that makes subroutines work.</p>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:1.25rem">
+            <div>
+                <div class="card">
+                    <h3>CALL Instructions</h3>
+                    <div class="stat-row"><span style="font-family:'JetBrains Mono';color:var(--accent)">LCALL</span><span style="font-size:0.8rem;color:#94a3b8">3-byte. Target anywhere in 64 KB ROM.</span></div>
+                    <div class="stat-row"><span style="font-family:'JetBrains Mono';color:var(--accent)">ACALL</span><span style="font-size:0.8rem;color:#94a3b8">2-byte. Target within 2 KB (memory efficient).</span></div>
+                    <div class="callout callout-blue" style="margin-top:0.75rem">
+                        When CALL executes, the CPU <strong>pushes the 16-bit PC</strong> of the next instruction onto the stack (low byte first, then high byte), then jumps. <code>RET</code> pops it back.
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>PUSH / POP Rules</h3>
+                    <ul style="font-size:0.83rem;color:#94a3b8;line-height:1.8;padding-left:1.2rem;margin:0">
+                        <li>Must specify <strong style="color:#fff">direct address</strong>, not register name. e.g., <code style="color:var(--accent)">PUSH 4</code> for R4.</li>
+                        <li>POP must be in <strong style="color:#fff">reverse PUSH order</strong> (LIFO).</li>
+                        <li>Stack Pointer (SP) resets to 07H on startup.</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="width:220px">
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+                    <div style="background:var(--surface2);padding:0.75rem 1rem;display:flex;justify-content:space-between;align-items:center">
+                        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem">Stack (LIFO)</span>
+                        <span style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--accent)">SP: <span id="spVal">07</span></span>
+                    </div>
+                    <div id="stackUI" style="min-height:160px;padding:0.75rem;display:flex;flex-direction:column-reverse;gap:3px">
+                        <div class="stack-empty">— Base (07H) —</div>
+                    </div>
+                    <div style="padding:0.75rem;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:4px">
+                        <button class="btn-primary" style="font-size:0.72rem;padding:0.35rem 0.5rem" id="btnCall" onclick="stackCall()">LCALL</button>
+                        <button class="btn-ghost" style="font-size:0.72rem;padding:0.35rem 0.5rem" id="btnRet" onclick="stackRet()" disabled>RET</button>
+                        <button class="btn-ghost" style="font-size:0.72rem;padding:0.35rem 0.5rem" id="btnPush" onclick="stackPush()" disabled>PUSH R4</button>
+                        <button class="btn-ghost" style="font-size:0.72rem;padding:0.35rem 0.5rem" id="btnPop" onclick="stackPop()" disabled>POP R4</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W4: Timing -->
+    <div class="section-view" id="w4-timing">
+        <div class="page-title">Timing & Time Delays</div>
+        <p class="page-sub">Software delay loops vs. hardware timers. NOP, DJNZ, and C-code implementations.</p>
+        <div class="card-2col">
+            <div class="card">
+                <h3>Delay Calculator</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+                    <div>
+                        <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:3px">Freq (MHz)</label>
+                        <input class="calc-input" id="delayFreq" value="11.0592" type="number" step="0.1" oninput="calcDelay()">
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:3px">Instruction MCs</label>
+                        <select class="calc-input" id="delayMC" onchange="calcDelay()">
+                            <option value="1">MOV/NOP (1 MC)</option>
+                            <option value="2" selected>DJNZ/SJMP (2 MC)</option>
+                            <option value="4">MUL AB (4 MC)</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem">
+                    <div class="stat-row"><span class="stat-label">Time per 1 MC</span><span id="d1mc" class="stat-val">1.085 µs</span></div>
+                    <div class="stat-row"><span class="stat-label">Exec time</span><span id="dTotal" style="font-family:'JetBrains Mono';font-size:1rem;color:var(--accent3);font-weight:700">2.170 µs</span></div>
+                </div>
+                <div style="margin-top:1rem">
+                    <h4>Chip Speed Evolution</h4>
+                    <div class="chart-wrap"><canvas id="mcEvolChart"></canvas></div>
+                </div>
+            </div>
+            <div>
+                <div class="card" style="background:#0d1117;margin-bottom:1.25rem">
+                    <h3 style="color:var(--accent2)">Hardware Timer Delay (C)</h3>
+                    <p style="font-size:0.78rem;color:#94a3b8;margin-bottom:0.75rem">Timer 0 Mode 1, 1ms delay @ 11.0592 MHz. TH0=0xFC, TL0=0x66.</p>
+                    <div class="code-block">
+<span class="kw">void</span> <span class="lbl">delay_1ms</span>() {
+  TMOD = <span class="num">0x01</span>; <span class="cmt">// Mode 1 (16-bit)</span>
+  TH0  = <span class="num">0xFC</span>;
+  TL0  = <span class="num">0x66</span>;
+  TR0  = <span class="num">1</span>;     <span class="cmt">// Start timer</span>
+  <span class="kw">while</span>(TF0 == <span class="num">0</span>);
+  TR0  = <span class="num">0</span>;
+  TF0  = <span class="num">0</span>;     <span class="cmt">// Clear flag</span>
+}
+                    </div>
+                </div>
+                <div class="card" style="background:#111318">
+                    <h3 style="color:var(--accent3)">Nested Loop Delay</h3>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-bottom:0.75rem">
+                        <div><label style="font-size:0.7rem;color:var(--muted);display:block;margin-bottom:2px">Freq</label><input class="calc-input" id="nlFreq" value="11.0592" type="number" step="0.1" oninput="calcNested()"></div>
+                        <div><label style="font-size:0.7rem;color:var(--muted);display:block;margin-bottom:2px">Outer (R2)</label><input class="calc-input" id="nlOuter" value="200" type="number" min="1" max="255" oninput="calcNested()"></div>
+                        <div><label style="font-size:0.7rem;color:var(--muted);display:block;margin-bottom:2px">Inner (R3)</label><input class="calc-input" id="nlInner" value="250" type="number" min="1" max="255" oninput="calcNested()"></div>
+                    </div>
+                    <div style="background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:0.75rem;font-family:'JetBrains Mono';font-size:0.72rem;line-height:1.8;margin-bottom:0.75rem">
+                        <span class="lbl">DELAY:</span> <span class="kw">MOV</span> <span class="reg">R2</span>, #<span id="nlCodeR2">200</span><br>
+                        <span class="lbl">AGAIN:</span> <span class="kw">MOV</span> <span class="reg">R3</span>, #<span id="nlCodeR3">250</span><br>
+                        <span class="lbl">HERE:</span>&nbsp; <span class="kw">NOP</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">NOP</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">DJNZ</span> <span class="reg">R3</span>, <span class="lbl">HERE</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">DJNZ</span> <span class="reg">R2</span>, <span class="lbl">AGAIN</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">RET</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span style="font-size:0.8rem;color:var(--muted)">Total delay:</span>
+                        <span id="nlTotal" style="font-family:'JetBrains Mono';font-size:1.1rem;font-weight:700;color:var(--accent2)">217.66 ms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W4: I/O -->
+    <div class="section-view" id="w4-io">
+        <div class="page-title">I/O & Bit-Level Logic</div>
+        <p class="page-sub">Monitoring hardware states with bit-jump instructions and controlling output devices.</p>
+        <div class="card-2col">
+            <div class="card" style="border-color:rgba(245,158,11,0.4)">
+                <h3 style="color:var(--accent3)">⚠ Port Reset Behavior</h3>
+                <p style="font-size:0.83rem;color:#94a3b8">On reset, all ports default to <code style="color:var(--accent3)">FFH</code> (all 1s). They act as <strong style="color:#fff">inputs</strong> by default. You must explicitly write to a pin to configure it as output.</p>
+            </div>
+            <div class="card" style="background:#0d1117">
+                <h3 style="color:var(--accent2)">Switch → LED Relay</h3>
+                <div class="code-block">
+<span class="lbl">HERE:</span> <span class="kw">MOV</span> <span class="reg">C</span>, P1.7  <span class="cmt">; Read switch</span>
+      <span class="kw">MOV</span> P2.0, <span class="reg">C</span>  <span class="cmt">; Write to LED</span>
+      <span class="kw">SJMP</span> <span class="lbl">HERE</span>    <span class="cmt">; Loop</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Oven Sim -->
+        <div class="card">
+            <h3>🔥 Oven Monitor Simulator (JNB Example)</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:center">
+                <div style="display:flex;flex-direction:column;gap:0.75rem">
+                    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem;display:flex;justify-content:space-between;align-items:center">
+                        <div><div style="font-weight:600">Oven Sensor</div><div style="font-size:0.72rem;color:var(--muted);font-family:'JetBrains Mono'">Input: P2.3</div></div>
+                        <div style="display:flex;align-items:center;gap:0.75rem">
+                            <label class="hw-switch"><input type="checkbox" id="ovenToggle" onchange="updateOven()"><span class="hw-slider"></span></label>
+                            <span id="ovenStatusTxt" style="font-family:'JetBrains Mono';font-size:0.78rem;color:var(--accent2);width:40px">SAFE</span>
+                        </div>
+                    </div>
+                    <div id="buzzerUI" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem;display:flex;justify-content:space-between;align-items:center;transition:all 0.3s">
+                        <div><div style="font-weight:600">Alarm Buzzer</div><div style="font-size:0.72rem;color:var(--muted);font-family:'JetBrains Mono'">Output: P1.5</div></div>
+                        <div id="buzzerIcon" style="width:36px;height:36px;border-radius:50%;background:var(--surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all 0.3s">🔕</div>
+                    </div>
+                </div>
+                <div class="code-block" style="font-size:0.75rem;line-height:1.9">
+<div id="ovenL1" style="padding:2px 4px;border-radius:3px;border-left:2px solid var(--accent);background:rgba(79,142,247,0.1)"><span class="lbl">HERE:</span> <span class="kw">JNB</span>  P2.3, <span class="lbl">HERE</span></div>
+<div id="ovenL2" style="padding:2px 4px;border-radius:3px;border-left:2px solid transparent;color:var(--muted)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ACALL</span> DELAY</div>
+<div id="ovenL3" style="padding:2px 4px;border-radius:3px;border-left:2px solid transparent;color:var(--muted)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">CPL</span>   P1.5</div>
+<div id="ovenL4" style="padding:2px 4px;border-radius:3px;border-left:2px solid transparent;color:var(--muted)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ACALL</span> DELAY</div>
+<div id="ovenL5" style="padding:2px 4px;border-radius:3px;border-left:2px solid transparent;color:var(--muted)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">SJMP</span>  <span class="lbl">HERE</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W4 NEW: 16-bit Arithmetic -->
+    <div class="section-view" id="w4-16bit">
+        <div class="page-title">16-bit Arithmetic <span class="new-tag">ADDED</span></div>
+        <p class="page-sub">When adding 8-bit numbers exceeds 255, the Carry flag allows you to build 16-bit results using two registers.</p>
+        <div class="card-2col">
+            <div class="card">
+                <h3>The Carry Flag (CY) in Arithmetic</h3>
+                <p style="font-size:0.83rem;color:#94a3b8;margin-bottom:1rem">When the result of an ADD operation exceeds <code style="color:var(--accent)">FFH</code> (255), the Carry flag is <strong style="color:#fff">automatically set to 1</strong> by the hardware. This is how 8-bit processors handle numbers larger than 8 bits.</p>
+                <div class="callout callout-green">
+                    <strong>Example:</strong><br>
+                    0xF5 (245) + 0xE2 (226) = 0x1D7 (471)<br>
+                    A = 0xD7, CY = 1 (the overflow)
+                </div>
+                <p style="font-size:0.83rem;color:#94a3b8;margin-top:0.75rem">Use <code style="color:var(--accent)">JNC</code> to conditionally increment the high byte register (R5) only when overflow occurred.</p>
+            </div>
+            <div class="card" style="background:#0d1117">
+                <h3 style="color:var(--accent2)">16-bit Addition Code</h3>
+                <div class="code-block">
+<span class="cmt">; Add 0xF5 + 0xE2 into R5:R0 (16-bit result)</span>
+  <span class="kw">MOV</span>  <span class="reg">A</span>, #0F5H
+  <span class="kw">ADD</span>  <span class="reg">A</span>, #0E2H  <span class="cmt">; A=D7H, CY=1</span>
+  <span class="kw">JNC</span>  <span class="lbl">NEXT</span>      <span class="cmt">; No carry → skip</span>
+  <span class="kw">INC</span>  <span class="reg">R5</span>        <span class="cmt">; High byte += 1</span>
+<span class="lbl">NEXT:</span>
+  <span class="kw">MOV</span>  <span class="reg">R0</span>, <span class="reg">A</span>     <span class="cmt">; Low byte in R0</span>
+<span class="cmt">; R5:R0 = 0x01D7 = 471 decimal</span>
+                </div>
+                <div class="callout callout-amber" style="margin-top:0.75rem">
+                    <strong>ADDC</strong> (Add with Carry) is used in multi-byte chained additions to propagate the carry bit automatically.
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- end wk-w4 -->
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         WEEK 5-6               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="week-view" id="wk-w56">
+
+    <div class="section-view active" id="w56-hw">
+        <div class="page-title">8051 Hardware Overview</div>
+        <p class="page-sub">Built-in components and the EA pin for external memory access.</p>
+        <div class="card-grid">
+            <div class="card" style="border-color:rgba(79,142,247,0.4)"><h4>CPU & Oscillator</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">Core processor and crystal clock circuit orchestrating all tasks.</p></div>
+            <div class="card" style="border-color:rgba(52,211,153,0.4)"><h4>Memory Block</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">4 KB internal ROM (code) + 128 bytes internal RAM (data).</p></div>
+            <div class="card" style="border-color:rgba(245,158,11,0.4)"><h4>I/O Ports (P0–P3)</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">Four 8-bit bidirectional ports, bridging the chip to the physical world.</p></div>
+            <div class="card" style="border-color:rgba(244,114,182,0.4)"><h4>Timers & Serial</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0">Two 16-bit timers (T0, T1) + one full-duplex serial port.</p></div>
+        </div>
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:1rem">
+                <h3 style="margin:0">External Access (EA̅) Pin</h3>
+                <div class="toggle-wrap">
+                    <button class="toggle-btn active" id="eaHigh" onclick="showEA('high')">EA = 1 (Vcc)</button>
+                    <button class="toggle-btn" id="eaLow" onclick="showEA('low')">EA = 0 (GND)</button>
+                </div>
+            </div>
+            <p id="eaDesc" style="font-size:0.83rem;color:#94a3b8">When <strong style="color:#fff">EA = 1 (High)</strong>: 8051 executes from internal 4 KB ROM (0000H–0FFFH). When PC exceeds 0FFFH, it automatically switches to external ROM.</p>
+        </div>
+    </div>
+
+    <div class="section-view" id="w56-mem">
+        <div class="page-title">Memory Map</div>
+        <p class="page-sub">The 8051 internal RAM is carefully partitioned. Click a block to explore.</p>
+        <div style="display:grid;grid-template-columns:200px 1fr;gap:1.5rem;align-items:start">
+            <div>
+                <div class="mem-block" data-mem="sfr" onclick="showMem('sfr',this)"><div style="font-family:'JetBrains Mono';font-size:0.7rem;color:var(--muted)">80H–FFH</div><div style="font-weight:600;font-size:0.85rem">SFR Space</div></div>
+                <div style="height:8px"></div>
+                <div class="mem-block" data-mem="scratch" onclick="showMem('scratch',this)"><div style="font-family:'JetBrains Mono';font-size:0.7rem;color:var(--muted)">30H–7FH</div><div style="font-weight:600;font-size:0.85rem">Scratch Pad RAM</div></div>
+                <div class="mem-block" data-mem="bit" onclick="showMem('bit',this)" style="margin-top:4px"><div style="font-family:'JetBrains Mono';font-size:0.7rem;color:var(--muted)">20H–2FH</div><div style="font-weight:600;font-size:0.85rem">Bit-Addressable</div></div>
+                <div class="mem-block sel" data-mem="banks" onclick="showMem('banks',this)" style="margin-top:4px"><div style="font-family:'JetBrains Mono';font-size:0.7rem;color:var(--muted)">00H–1FH</div><div style="font-weight:600;font-size:0.85rem">Register Banks</div></div>
+            </div>
+            <div id="memDetail" class="card">
+                <h4>Register Banks (00H–1FH)</h4>
+                <p style="font-size:0.83rem;color:#94a3b8;margin-bottom:0.75rem">32 bytes split into 4 banks of 8 registers (R0–R7). Active bank selected by RS1, RS0 in PSW.</p>
+                <div style="font-family:'JetBrains Mono';font-size:0.75rem;color:var(--muted);line-height:1.8">
+                    Bank 0: 00H–07H | Bank 1: 08H–0FH<br>Bank 2: 10H–17H | Bank 3: 18H–1FH
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w56-sfr">
+        <div class="page-title">SFRs & Program Status Word</div>
+        <p class="page-sub">Click RS1 and RS0 to switch active register banks. Other flags are shown for reference.</p>
+        <div class="card" style="margin-bottom:1.5rem">
+            <h3>Interactive PSW Register</h3>
+            <div style="display:flex;justify-content:center;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap" id="pswBits">
+                <div style="text-align:center"><div class="bit-btn" style="cursor:default;opacity:0.5">0<span class="bit-label">CY</span></div></div>
+                <div style="text-align:center"><div class="bit-btn" style="cursor:default;opacity:0.5">0<span class="bit-label">AC</span></div></div>
+                <div style="text-align:center"><div class="bit-btn" style="cursor:default;opacity:0.5">0<span class="bit-label">F0</span></div></div>
+                <div style="text-align:center"><div class="bit-btn" id="psw_rs1" onclick="togglePSW('rs1')">0<span class="bit-label">RS1</span></div></div>
+                <div style="text-align:center"><div class="bit-btn" id="psw_rs0" onclick="togglePSW('rs0')">0<span class="bit-label">RS0</span></div></div>
+                <div style="text-align:center"><div class="bit-btn" style="cursor:default;opacity:0.5">0<span class="bit-label">OV</span></div></div>
+                <div style="text-align:center"><div class="bit-btn" style="cursor:default;opacity:0.5">0<span class="bit-label">—</span></div></div>
+                <div style="text-align:center"><div class="bit-btn" style="cursor:default;opacity:0.5">0<span class="bit-label">P</span></div></div>
+            </div>
+            <div id="pswStatus" class="callout callout-blue">Active Register Bank: <strong>Bank 0</strong> (00H–07H). No arithmetic flags set.</div>
+        </div>
+        <div class="card-2col">
+            <div class="card"><h4>Port 3 Alternate Functions</h4><table class="styled-table"><tbody>
+                <tr><td><code>P3.0</code></td><td>RxD — Serial In</td></tr>
+                <tr><td><code>P3.1</code></td><td>TxD — Serial Out</td></tr>
+                <tr><td><code>P3.2</code></td><td>INT0 — Ext Interrupt 0</td></tr>
+                <tr><td><code>P3.3</code></td><td>INT1 — Ext Interrupt 1</td></tr>
+                <tr><td><code>P3.4</code></td><td>T0 — Timer 0 Input</td></tr>
+                <tr><td><code>P3.5</code></td><td>T1 — Timer 1 Input</td></tr>
+                <tr><td><code>P3.6</code></td><td>W̄R̄ — Ext Mem Write</td></tr>
+                <tr><td><code>P3.7</code></td><td>R̄D̄ — Ext Mem Read</td></tr>
+            </tbody></table></div>
+            <div class="card"><h4>Data Pointer (DPTR)</h4><p style="font-size:0.83rem;color:#94a3b8;margin-bottom:0.75rem">A 16-bit register split into DPH (high byte) and DPL (low byte). Used specifically to point to addresses in <strong style="color:#fff">External Data Memory</strong> when used with the <code style="color:var(--accent)">MOVX</code> instruction.</p><div class="callout callout-green"><strong>Key SFRs:</strong> ACC (E0H), B (F0H), PSW (D0H), SP (81H), DPTR = DPH:DPL</div></div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w56-timers">
+        <div class="page-title">Timers & Timing</div>
+        <p class="page-sub">TMOD, TCON, and the Timer Mode 2 auto-reload simulator.</p>
+        <div class="card-2col">
+            <div class="card">
+                <h3>Timing Calculator</h3>
+                <div style="margin-bottom:0.75rem"><label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:3px">Crystal Frequency (MHz)</label><input class="calc-input" id="timerFreq" value="11.0592" type="number" step="0.1" oninput="calcTimerFreq()"></div>
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem">
+                    <div class="stat-row"><span class="stat-label">1 Clock Cycle</span><span id="tClk" class="stat-val">0.090 µs</span></div>
+                    <div class="stat-row"><span class="stat-label">1 Machine Cycle</span><span id="tMC" style="font-family:'JetBrains Mono';font-size:1rem;font-weight:700;color:var(--accent3)">1.085 µs</span></div>
+                </div>
+                <div style="margin-top:1rem"><div class="chart-wrap"><canvas id="instrChart"></canvas></div></div>
+            </div>
+            <div class="card">
+                <h3>Timer Mode 2 Simulator (Auto-Reload)</h3>
+                <p style="font-size:0.8rem;color:#94a3b8;margin-bottom:1rem">TL1 counts up. On overflow → TF1 set, hardware reloads TH1 into TL1.</p>
+                <div style="display:flex;gap:1rem;align-items:center;justify-content:center;margin-bottom:1rem;flex-wrap:wrap">
+                    <div style="text-align:center">
+                        <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">TH1 (Reload)</div>
+                        <input id="simTH1" value="FD" maxlength="2" class="calc-input" style="width:56px;height:52px;text-align:center;font-size:1.2rem;font-weight:700;text-transform:uppercase">
+                    </div>
+                    <div style="color:var(--muted);font-size:1.5rem;margin-top:16px">→</div>
+                    <div style="text-align:center">
+                        <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">TL1 (Counter)</div>
+                        <div id="simTL1" style="width:56px;height:52px;background:rgba(52,211,153,0.1);border:2px solid rgba(52,211,153,0.3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:1.1rem;font-weight:700;color:var(--accent2)">FD</div>
+                    </div>
+                    <div style="color:var(--muted);font-size:1.5rem;margin-top:16px">→</div>
+                    <div style="text-align:center">
+                        <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">TF1</div>
+                        <div id="simTF1" style="width:56px;height:52px;background:var(--surface2);border:2px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:1.3rem;font-weight:700;color:var(--muted);transition:all 0.2s">0</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:0.5rem">
+                    <button class="btn-primary" style="flex:1" onclick="simStep()">+1 Machine Cycle</button>
+                    <button class="btn-ghost" onclick="simReset()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w56-irq">
+        <div class="page-title">Interrupts</div>
+        <p class="page-sub">5 interrupt sources, IE register, and IP priority.</p>
+        <div class="card-2col">
+            <div class="card" style="padding:0;overflow:hidden">
+                <div style="background:rgba(245,158,11,0.15);border-bottom:1px solid rgba(245,158,11,0.3);padding:0.75rem 1.25rem"><h3 style="margin:0;color:var(--accent3)">Interrupt Vector Table</h3></div>
+                <table class="styled-table">
+                    <thead><tr><th>Priority</th><th>Source</th><th>Flag</th><th>Vector</th></tr></thead>
+                    <tbody>
+                        <tr><td>1 (Highest)</td><td>External INT0</td><td><code>IE0</code></td><td class="ivec">0x0003</td></tr>
+                        <tr><td>2</td><td>Timer 0 Overflow</td><td><code>TF0</code></td><td class="ivec">0x000B</td></tr>
+                        <tr><td>3</td><td>External INT1</td><td><code>IE1</code></td><td class="ivec">0x0013</td></tr>
+                        <tr><td>4</td><td>Timer 1 Overflow</td><td><code>TF1</code></td><td class="ivec">0x001B</td></tr>
+                        <tr><td>5 (Lowest)</td><td>Serial Port</td><td><code>RI/TI</code></td><td class="ivec">0x0023</td></tr>
+                    </tbody>
+                </table>
+                <div style="padding:0.75rem 1.25rem" class="callout callout-amber">Vectors are only 8 bytes apart. Place <code>LJMP ISR_name</code> at the vector if the ISR is larger than 8 bytes.</div>
+            </div>
+            <div>
+                <div class="card" style="margin-bottom:1.25rem"><h4>IE Register</h4>
+                    <div class="stat-row"><span style="font-family:'JetBrains Mono';color:var(--accent)">EA</span><span style="font-size:0.8rem;color:#94a3b8">Global enable. Must be 1 for ANY interrupt.</span></div>
+                    <div class="stat-row"><span style="font-family:'JetBrains Mono';color:var(--accent)">EX0/EX1</span><span style="font-size:0.8rem;color:#94a3b8">Enable External Interrupts 0/1</span></div>
+                    <div class="stat-row"><span style="font-family:'JetBrains Mono';color:var(--accent)">ET0/ET1</span><span style="font-size:0.8rem;color:#94a3b8">Enable Timer 0/1 Overflow Interrupts</span></div>
+                    <div class="stat-row"><span style="font-family:'JetBrains Mono';color:var(--accent)">ES</span><span style="font-size:0.8rem;color:#94a3b8">Enable Serial Port Interrupt</span></div>
+                </div>
+                <div class="card"><h4>IP Register (Priority)</h4><p style="font-size:0.83rem;color:#94a3b8;margin:0">Assign High(1) or Low(0) priority. A <strong style="color:#fff">high-priority ISR can interrupt a running low-priority ISR</strong>. Simultaneous same-priority interrupts resolve by default polling sequence.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w56-clab">
+        <div class="page-title">C-Programming Lab</div>
+        <p class="page-sub">Using the Keil compiler with sbit to monitor a switch and control an LED.</p>
+        <div class="card-2col">
+            <div class="card" style="background:#111827;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;min-height:260px">
+                <h3 style="margin:0">Dev Board</h3>
+                <div style="display:flex;gap:3rem;align-items:center">
+                    <div style="text-align:center">
+                        <label class="hw-switch"><input type="checkbox" id="labSwitch" checked onchange="updateLab()"><span class="hw-slider"></span></label>
+                        <div style="margin-top:0.5rem;font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;color:var(--accent2)">Switch (P1^1)</div>
+                        <div style="font-family:'JetBrains Mono';font-size:0.7rem;color:var(--muted)">= <span id="labSwVal">1</span></div>
+                    </div>
+                    <div style="text-align:center">
+                        <div id="labLED" style="width:32px;height:32px;border-radius:50%;background:#374151;border:2px solid #4b5563;transition:all 0.3s;margin:0 auto"></div>
+                        <div style="margin-top:0.5rem;font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;color:var(--accent4)">LED (P2^1)</div>
+                        <div style="font-family:'JetBrains Mono';font-size:0.7rem;color:var(--muted)">= <span id="labLEDVal">0</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="code-block" style="font-size:0.78rem;line-height:1.8">
+<span class="kw">#include</span> &lt;reg51.h&gt;
+
+<span class="kw">sbit</span> Led    = P2^1;
+<span class="kw">sbit</span> Switch = P1^1;
+
+<span class="kw">int</span> <span class="lbl">main</span>() {
+  Led = <span class="num">0</span>;    <span class="cmt">// P2.1 as output</span>
+  Switch = <span class="num">1</span>; <span class="cmt">// P1.1 as input</span>
+
+  <span class="kw">while</span>(<span class="num">1</span>) {
+    <div id="labCodeIf" style="padding:1px 4px;border-radius:3px;border-left:2px solid transparent"><span class="kw">if</span>(Switch == <span class="num">0</span>) {</div>
+      <div id="labCodeOn" style="padding:1px 4px 1px 16px;border-radius:3px;border-left:2px solid transparent">Led = <span class="num">1</span>; <span class="cmt">// ON</span></div>
+    <div id="labCodeElse" style="padding:1px 4px;border-radius:3px;border-left:2px solid transparent">} <span class="kw">else</span> {</div>
+      <div id="labCodeOff" style="padding:1px 4px 1px 16px;border-radius:3px;border-left:2px solid transparent">Led = <span class="num">0</span>; <span class="cmt">// OFF</span></div>
+    }
+  }
+}
+            </div>
+        </div>
+    </div>
+
+    <!-- W56 NEW: Square Waves -->
+    <div class="section-view" id="w56-freq">
+        <div class="page-title">Generating Square Waves <span class="new-tag">ADDED</span></div>
+        <p class="page-sub">Using timers to generate accurate frequencies. Mode 2 (auto-reload) vs Mode 1 (manual reload).</p>
+        <div class="card-2col">
+            <div class="card" style="border-color:rgba(52,211,153,0.4)">
+                <h3 style="color:var(--accent2)">✅ Mode 2 — Auto-Reload (Preferred)</h3>
+                <p style="font-size:0.83rem;color:#94a3b8;margin-bottom:0.75rem">Set a negative reload value in TH0. Every TL0 overflow automatically reloads and sets TF0. Just clear the flag and toggle the pin. <strong style="color:#fff">Timer never stops.</strong></p>
+                <div class="code-block" style="font-size:0.75rem">
+<span class="cmt">; 10 kHz square wave on P1.0</span>
+<span class="cmt">; Mode 2: TMOD = 0x02, TH0 = -50 = 0xCE</span>
+<span class="lbl">MAIN:</span>
+  <span class="kw">MOV</span> TMOD, #02H
+  <span class="kw">MOV</span> TH0, #-50    <span class="cmt">; Reload = 0xCE</span>
+  <span class="kw">MOV</span> TL0, #-50
+  <span class="kw">SETB</span> TR0
+<span class="lbl">LOOP:</span>
+  <span class="kw">JNB</span> TF0, <span class="lbl">LOOP</span>
+  <span class="kw">CLR</span> TF0
+  <span class="kw">CPL</span> P1.0         <span class="cmt">; Toggle</span>
+  <span class="kw">SJMP</span> <span class="lbl">LOOP</span>
+                </div>
+            </div>
+            <div class="card" style="border-color:rgba(245,158,11,0.4)">
+                <h3 style="color:var(--accent3)">⚠ Mode 1 — 16-bit (Manual Reload)</h3>
+                <p style="font-size:0.83rem;color:#94a3b8;margin-bottom:0.75rem">Needed for longer delays (e.g., 500 µs for 1 kHz). Because Mode 1 does NOT auto-reload, you must manually reset TH0:TL0 in software after every overflow — which can introduce slight timing inaccuracies.</p>
+                <div class="code-block" style="font-size:0.75rem">
+<span class="cmt">; 1 kHz: 500µs interval</span>
+<span class="lbl">LOOP:</span>
+  <span class="kw">MOV</span> TH0, #0FEH  <span class="cmt">; Must reload manually</span>
+  <span class="kw">MOV</span> TL0, #083H
+  <span class="kw">SETB</span> TR0
+  <span class="lbl">HERE:</span> <span class="kw">JNB</span> TF0, <span class="lbl">HERE</span>
+  <span class="kw">CLR</span>  TF0
+  <span class="kw">CLR</span>  TR0
+  <span class="kw">CPL</span>  P1.0
+  <span class="kw">SJMP</span> <span class="lbl">LOOP</span>
+                </div>
+                <div class="callout callout-amber" style="margin-top:0.75rem;font-size:0.78rem">The reload time (2 MOV instructions) adds ~2 µs latency to each cycle, degrading frequency accuracy.</div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- end wk-w56 -->
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║       WEEK 6-7 MEMORY LAB      ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="week-view" id="wk-w67a">
+
+    <div class="section-view active" id="w67a-basics">
+        <div class="page-title">Memory Capacity</div>
+        <p class="page-sub">How to calculate chip capacity from address and data pins.</p>
+        <div class="card-2col">
+            <div class="card">
+                <h3>Capacity Calculator</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+                    <div><label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:3px">Address pins (x)</label><input class="calc-input" id="memAddr" value="16" type="number" min="1" max="32" oninput="calcMem()"></div>
+                    <div><label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:3px">Data pins (y)</label><select class="calc-input" id="memData" onchange="calcMem()"><option value="1">1-bit</option><option value="4">4-bit</option><option value="8" selected>8-bit</option><option value="16">16-bit</option></select></div>
+                </div>
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem">
+                    <div class="stat-row"><span class="stat-label">Locations (2<sup>x</sup>)</span><span id="memLocs" class="stat-val">65,536</span></div>
+                    <div class="stat-row"><span class="stat-label">Chip capacity (bits)</span><span id="memBits" style="font-family:'JetBrains Mono';font-size:0.88rem;color:var(--accent2);font-weight:700">512 Kbits</span></div>
+                    <div class="stat-row"><span class="stat-label">System capacity</span><span id="memBytes" style="font-family:'JetBrains Mono';font-size:1rem;color:var(--accent3);font-weight:700">64 KB</span></div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Key Terminology</h3>
+                <div class="stat-row"><span class="stat-label">Access Time</span><span style="font-size:0.78rem;color:#94a3b8;text-align:right;max-width:55%">Delay from address → data valid. Shorter = faster = more expensive.</span></div>
+                <div class="stat-row" style="margin-top:0.5rem"><span style="font-family:'JetBrains Mono';color:var(--accent)">OE̅</span><span style="font-size:0.78rem;color:#94a3b8">Output Enable (ROM read)</span></div>
+                <div class="stat-row"><span style="font-family:'JetBrains Mono';color:var(--accent)">WE̅</span><span style="font-size:0.78rem;color:#94a3b8">Write Enable (RAM write)</span></div>
+                <div class="stat-row"><span style="font-family:'JetBrains Mono';color:var(--accent)">CS̅/CE̅</span><span style="font-size:0.78rem;color:#94a3b8">Chip Select — must be LOW to activate chip</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W67A NEW: Memory Types -->
+    <div class="section-view" id="w67a-types">
+        <div class="page-title">Memory Types <span class="new-tag">ADDED</span></div>
+        <p class="page-sub">A full breakdown of ROM and RAM variants — volatile, non-volatile, and their trade-offs.</p>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.75rem">Read-Only Memory (Non-Volatile)</div>
+        <div class="card-grid" style="margin-bottom:1.5rem">
+            <div class="card" style="border-color:rgba(79,142,247,0.4)"><h4>PROM</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0 0 0.5rem">Programmable via internal fuses. Requires a special ROM burner. <strong style="color:#fff">One-time programmable</strong>.</p><span class="badge badge-red">✗ No erase</span></div>
+            <div class="card" style="border-color:rgba(245,158,11,0.4)"><h4>UV-EPROM (87xx)</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0 0 0.5rem">Erased by UV light through a physical window. Takes 15–20 min. Programmed via 12.5V on V<sub>pp</sub>. Part numbers: <code style="color:var(--accent)">27xxx</code></p><span class="badge badge-amber">~1K cycles</span></div>
+            <div class="card" style="border-color:rgba(52,211,153,0.4)"><h4>Flash EPROM (89xx)</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0 0 0.5rem">Electrically erased in &lt;1 second. ~100 ns access. Can be programmed on the board. Part numbers: <code style="color:var(--accent)">28Fxxxx</code></p><span class="badge badge-green">100K+ cycles</span></div>
+            <div class="card" style="border-color:rgba(244,114,182,0.4)"><h4>EEPROM</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0 0 0.5rem">Electrically erasable, single-byte granularity. Can be programmed while on the system board without external equipment.</p><span class="badge badge-pink">Byte-level erase</span></div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.75rem">Random Access Memory (Volatile unless noted)</div>
+        <div class="card-grid">
+            <div class="card"><h4>SRAM (Static)</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0 0 0.5rem">Built from flip-flops — 6+ transistors per bit. Very fast, no refresh needed. Used for cache and internal MCU RAM.</p><span class="badge badge-blue">Fast, power-hungry</span></div>
+            <div class="card"><h4>DRAM (Dynamic)</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0 0 0.5rem">1 capacitor + 1 transistor per bit. Cheap and dense but leaks charge, requiring periodic <strong style="color:#fff">refresh cycles</strong>. Uses RAS/CAS multiplexed addressing to save pins.</p><span class="badge badge-amber">Cheap, needs refresh</span></div>
+            <div class="card" style="border-color:rgba(52,211,153,0.4)"><h4>NV-RAM (Non-Volatile)</h4><p style="font-size:0.82rem;color:#94a3b8;margin:0 0 0.5rem">SRAM + internal lithium battery. Detects V<sub>cc</sub> loss and instantly switches to battery. DS5000 includes a real-time clock (RTC).</p><span class="badge badge-green">Retains on power-off</span></div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w67a-decode">
+        <div class="page-title">Address Decoding (74LS138)</div>
+        <p class="page-sub">Toggle the address inputs to see which chip is selected.</p>
+        <div class="card" style="display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center">
+            <div>
+                <h3>8051 Address Lines (A12–A14)</h3>
+                <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.75rem">
+                    <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:'JetBrains Mono';color:var(--accent)">A14 (C)</span><label class="hw-switch"><input type="checkbox" id="decC" onchange="updateDecoder()"><span class="hw-slider"></span></label></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:'JetBrains Mono';color:var(--accent)">A13 (B)</span><label class="hw-switch"><input type="checkbox" id="decB" onchange="updateDecoder()"><span class="hw-slider"></span></label></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:'JetBrains Mono';color:var(--accent)">A12 (A)</span><label class="hw-switch"><input type="checkbox" id="decA" onchange="updateDecoder()"><span class="hw-slider"></span></label></div>
+                </div>
+            </div>
+            <div style="background:#1e2430;border:2px solid var(--border);border-radius:8px;width:80px;padding:1.5rem 0.5rem;text-align:center;font-family:'Syne',sans-serif;font-weight:700;font-size:0.75rem">74LS138<br><span style="font-weight:400;font-size:0.65rem;color:var(--muted)">3-to-8</span></div>
+            <div>
+                <h3>Active-Low Outputs (Y̅)</h3>
+                <div id="decOutputs" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:0.75rem"></div>
+                <div id="decRange" class="callout callout-green" style="margin-top:0.75rem;font-size:0.78rem"><strong>Selected:</strong> 0000H–0FFFH (4 KB)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w67a-ale">
+        <div class="page-title">ALE Multiplexing</div>
+        <p class="page-sub">How Port 0 doubles as address bus and data bus using the 74LS373 latch.</p>
+        <div class="card" style="background:#0d1117">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                <h3 style="margin:0;color:var(--accent)">Bus Cycle Simulation</h3>
+                <button class="btn-primary" id="aleBtn" onclick="stepALE()">Step 1: Output Address</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:200px;flex-wrap:wrap">
+                <div style="background:#1e2430;border:2px solid #374151;border-radius:8px;width:100px;padding:1rem;text-align:center"><div style="font-family:'Syne',sans-serif;font-weight:800">8051</div><div style="font-size:0.65rem;color:var(--muted);margin-top:0.5rem;font-family:'JetBrains Mono'">P2: A8-A15<br>P0: multiplex<br>ALE ↑<br>PSEN̅</div></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:0.5rem;min-width:140px">
+                    <div style="background:#1e293b;border:1px solid #374151;border-radius:4px;padding:0.35rem;text-align:center;font-family:'JetBrains Mono';font-size:0.72rem;color:#93c5fd">A8–A15 (Port 2 — stable)</div>
+                    <div id="aleP0" style="background:#1e293b;border:1px solid #374151;border-radius:4px;padding:0.35rem;text-align:center;font-family:'JetBrains Mono';font-size:0.72rem;color:var(--muted);transition:all 0.3s">Port 0: High-Z</div>
+                    <div style="display:flex;gap:0.35rem">
+                        <div id="aleALE" style="flex:1;background:#1e293b;border:1px solid #374151;border-radius:4px;padding:0.25rem;text-align:center;font-family:'JetBrains Mono';font-size:0.68rem;color:var(--muted);transition:all 0.3s">ALE: 0</div>
+                        <div id="alePSEN" style="flex:1;background:#1e293b;border:1px solid #374151;border-radius:4px;padding:0.25rem;text-align:center;font-family:'JetBrains Mono';font-size:0.68rem;color:var(--muted);transition:all 0.3s">PSEN: 1</div>
+                    </div>
+                </div>
+                <div id="aleLatch" style="background:#134e4a;border:2px solid #0f766e;border-radius:8px;width:70px;padding:0.75rem 0.4rem;text-align:center;font-size:0.7rem;font-weight:700;transition:all 0.3s">74LS373<br><span id="aleLatchVal" style="font-family:'JetBrains Mono';font-size:0.65rem;color:#5eead4">Empty</span></div>
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;min-width:80px">
+                    <div id="aleDataBus" style="background:#1e293b;border:1px solid #374151;border-radius:4px;padding:0.5rem;text-align:center;font-family:'JetBrains Mono';font-size:0.72rem;color:var(--muted);transition:all 0.3s;width:100%">D0–D7 idle</div>
+                </div>
+                <div style="background:#431407;border:2px solid #7c2d12;border-radius:8px;width:90px;padding:1rem;text-align:center"><div style="font-family:'Syne',sans-serif;font-weight:800;color:#fdba74">Ext ROM</div><div id="aleROM" style="margin-top:0.5rem;font-family:'JetBrains Mono';font-size:0.65rem;color:#92400e;transition:all 0.3s">Data Out: —</div></div>
+            </div>
+            <div id="aleDesc" class="callout callout-blue" style="margin-top:1rem">Click the button to simulate the external memory fetch cycle step by step.</div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w67a-ea">
+        <div class="page-title">The EA̅ Pin & Memory Maps</div>
+        <p class="page-sub">Select MCU model and EA state to see the memory execution map.</p>
+        <div class="card" style="display:grid;grid-template-columns:220px 1fr;gap:2rem;align-items:start">
+            <div style="display:flex;flex-direction:column;gap:0.75rem">
+                <div><label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:4px">MCU Model</label><select class="calc-input" id="eaMCU" onchange="updateEAMap()"><option value="8031">8031 (0 KB ROM)</option><option value="8051" selected>8051 (4 KB ROM)</option><option value="8052">8052 (8 KB ROM)</option></select></div>
+                <div><label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:4px">EA̅ Pin</label><select class="calc-input" id="eaPIN" onchange="updateEAMap()"><option value="vcc" selected>High (Vcc) — Internal first</option><option value="gnd">Low (GND) — External only</option></select></div>
+                <div id="eaNote" class="callout callout-blue" style="font-size:0.78rem"></div>
+            </div>
+            <div style="display:flex;gap:1rem;align-items:flex-start">
+                <div id="eaMapViz" style="width:140px;min-height:320px;background:var(--surface2);border:2px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column"></div>
+                <div id="eaAddrLabels" style="display:flex;flex-direction:column;justify-content:space-between;font-family:'JetBrains Mono';font-size:0.7rem;color:var(--muted);min-height:320px;padding:2px 0">
+                    <span>0000H</span><span id="eaBoundary" style="color:var(--accent)">0FFFH</span><span>FFFFH</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w67a-movx">
+        <div class="page-title">MOVX Assembly Stepper</div>
+        <p class="page-sub">Copying 10 bytes from external ROM to internal RAM using DPTR and MOVX.</p>
+        <div class="card-2col">
+            <div style="background:#0d1117;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+                <div style="background:#161b22;padding:0.75rem 1rem;display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-family:'Syne',sans-serif;font-weight:700;color:#fff">Assembly Stepper</span>
+                    <button class="btn-primary" style="font-size:0.75rem" id="movxBtn" onclick="stepMOVX()">Step Execute</button>
+                </div>
+                <div style="padding:1rem;font-family:'JetBrains Mono';font-size:0.75rem;line-height:1.9" id="movxCode">
+                    <div id="mc0" style="padding:2px 6px;border-radius:3px;border-left:2px solid transparent;color:#6e7681"><span class="kw">MOV</span>  DPTR, #0000H <span class="cmt"> ; External table start</span></div>
+                    <div id="mc1" style="padding:2px 6px;border-radius:3px;border-left:2px solid transparent;color:#6e7681"><span class="kw">MOV</span>  R5, #0AH    <span class="cmt"> ; Counter = 10</span></div>
+                    <div id="mc2" style="padding:2px 6px;border-radius:3px;border-left:2px solid transparent;color:#6e7681"><span class="kw">MOV</span>  R0, #30H    <span class="cmt"> ; Int RAM start</span></div>
+                    <div id="mc3" style="padding:2px 6px;border-radius:3px;border-left:2px solid transparent;color:#6e7681"><span class="lbl">BACK:</span> <span class="kw">MOVX</span> A, @DPTR  <span class="cmt"> ; Read ext mem</span></div>
+                    <div id="mc4" style="padding:2px 6px;border-radius:3px;border-left:2px solid transparent;color:#6e7681">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">MOV</span>  @R0, A    <span class="cmt"> ; Write int RAM</span></div>
+                    <div id="mc5" style="padding:2px 6px;border-radius:3px;border-left:2px solid transparent;color:#6e7681">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">INC</span>  DPTR     <span class="cmt"> ; Next ext addr</span></div>
+                    <div id="mc6" style="padding:2px 6px;border-radius:3px;border-left:2px solid transparent;color:#6e7681">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">INC</span>  R0       <span class="cmt"> ; Next int addr</span></div>
+                    <div id="mc7" style="padding:2px 6px;border-radius:3px;border-left:2px solid transparent;color:#6e7681">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">DJNZ</span> R5, <span class="lbl">BACK</span> <span class="cmt"> ; Loop</span></div>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:1rem">
+                <div class="card" style="padding:1rem">
+                    <h4>Registers</h4>
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;text-align:center;font-family:'JetBrains Mono'">
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.5rem"><div style="font-size:0.62rem;color:var(--muted)">DPTR</div><div id="movxDPTR" style="font-weight:700;font-size:0.82rem;color:var(--accent)">—</div></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.5rem"><div style="font-size:0.62rem;color:var(--muted)">R5</div><div id="movxR5" style="font-weight:700;font-size:0.82rem;color:var(--accent)">—</div></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.5rem"><div style="font-size:0.62rem;color:var(--muted)">R0</div><div id="movxR0" style="font-weight:700;font-size:0.82rem;color:var(--accent)">—</div></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.5rem"><div style="font-size:0.62rem;color:var(--muted)">A</div><div id="movxA" style="font-weight:700;font-size:0.82rem;color:var(--accent)">—</div></div>
+                    </div>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><span style="font-size:0.75rem;color:var(--accent2);font-family:'Syne',sans-serif;font-weight:700">Int RAM (30H–39H)</span><span id="movxLog" style="font-size:0.72rem;color:var(--muted);font-style:italic">Ready.</span></div>
+                    <div id="movxRAM" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center;font-family:'JetBrains Mono';font-size:0.75rem"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- end wk-w67a -->
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║      WEEK 6-7 TIMERS & IRQ     ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="week-view" id="wk-w67b">
+
+    <div class="section-view active" id="w67b-mem">
+        <div class="page-title">Memory & SFRs (Deep Dive)</div>
+        <p class="page-sub">Interactive memory map and PSW register bank configurator.</p>
+        <div class="card-2col">
+            <div style="display:grid;grid-template-columns:140px 1fr;gap:1rem;align-items:start">
+                <div style="display:flex;flex-direction:column;gap:4px">
+                    <div class="mem-block" onclick="showMem2('sfr2',this)"><span style="font-family:'JetBrains Mono';font-size:0.68rem;color:var(--muted)">FFH–80H</span><br><span style="font-size:0.82rem;font-weight:600">SFR Space</span></div>
+                    <div class="mem-block" onclick="showMem2('scratch2',this)"><span style="font-family:'JetBrains Mono';font-size:0.68rem;color:var(--muted)">7FH–30H</span><br><span style="font-size:0.82rem;font-weight:600">Scratch Pad</span></div>
+                    <div class="mem-block" onclick="showMem2('bit2',this)"><span style="font-family:'JetBrains Mono';font-size:0.68rem;color:var(--muted)">2FH–20H</span><br><span style="font-size:0.82rem;font-weight:600">Bit Addr.</span></div>
+                    <div class="mem-block sel" onclick="showMem2('banks2',this)"><span style="font-family:'JetBrains Mono';font-size:0.68rem;color:var(--muted)">1FH–00H</span><br><span style="font-size:0.82rem;font-weight:600">Reg Banks</span></div>
+                </div>
+                <div id="memDetail2" class="card">
+                    <h4>Register Banks (00H–1FH)</h4>
+                    <p style="font-size:0.83rem;color:#94a3b8;margin:0">4 banks of R0–R7. Active bank selected by RS1:RS0 in PSW.</p>
+                </div>
+            </div>
+            <div class="card">
+                <h3>PSW — RS1/RS0 Bank Selector</h3>
+                <div style="display:flex;justify-content:center;gap:8px;margin-bottom:1rem">
+                    <div style="text-align:center"><div class="bit-btn" id="psw2_rs1" onclick="togglePSW2('rs1')">0<span class="bit-label">RS1</span></div></div>
+                    <div style="text-align:center"><div class="bit-btn" id="psw2_rs0" onclick="togglePSW2('rs0')">0<span class="bit-label">RS0</span></div></div>
+                </div>
+                <div id="psw2Status" class="callout callout-blue">Active: <strong>Bank 0</strong> (00H–07H)</div>
+                <div style="margin-top:1rem">
+                    <h4>Port 3 Quick Reference</h4>
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:0.7rem;text-align:center;font-family:'JetBrains Mono'">
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px">P3.0<br><span style="color:var(--accent2)">RxD</span></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px">P3.1<br><span style="color:var(--accent2)">TxD</span></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px">P3.2<br><span style="color:var(--accent3)">INT0</span></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px">P3.3<br><span style="color:var(--accent3)">INT1</span></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px">P3.4<br><span style="color:var(--accent)">T0</span></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px">P3.5<br><span style="color:var(--accent)">T1</span></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px">P3.6<br><span style="color:#f87171">WR̅</span></div>
+                        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px">P3.7<br><span style="color:#f87171">RD̅</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w67b-timing">
+        <div class="page-title">Core Timing</div>
+        <p class="page-sub">1 State = 2 Clocks. 1 MC = 6 States = 12 Clocks.</p>
+        <div class="card-2col">
+            <div class="card">
+                <h3>Timing Calculator</h3>
+                <div style="margin-bottom:0.75rem"><label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:3px">Crystal Frequency (MHz)</label><input class="calc-input" id="t2Freq" value="12" type="number" step="0.5" oninput="calcT2()"></div>
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem">
+                    <div class="stat-row"><span class="stat-label">1 Clock Cycle</span><span id="t2Clk" class="stat-val">0.083 µs</span></div>
+                    <div class="stat-row"><span class="stat-label">1 Machine Cycle</span><span id="t2MC" style="font-family:'JetBrains Mono';font-size:1rem;font-weight:700;color:var(--accent3)">1.000 µs</span></div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Instruction Speed Table</h3>
+                <table class="styled-table">
+                    <thead><tr><th>Instruction</th><th>MCs</th><th>@ 12 MHz</th></tr></thead>
+                    <tbody>
+                        <tr><td>MOV, ADD, SETB, CLR</td><td>1</td><td id="t2Row1" style="font-family:'JetBrains Mono';color:var(--accent2)">1.000 µs</td></tr>
+                        <tr><td>JMP, JZ, DJNZ, CALL</td><td>2</td><td id="t2Row2" style="font-family:'JetBrains Mono';color:var(--accent3)">2.000 µs</td></tr>
+                        <tr><td>MUL AB, DIV AB</td><td>4</td><td id="t2Row4" style="font-family:'JetBrains Mono';color:#f87171">4.000 µs</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w67b-tmod">
+        <div class="page-title">Timer Configuration</div>
+        <p class="page-sub">Interactive TMOD register — click bits to configure Timer 0.</p>
+        <div class="card" style="margin-bottom:1.5rem">
+            <h3>TMOD Configurator (Timer 0 nibble)</h3>
+            <div style="display:flex;justify-content:center;gap:12px;margin-bottom:1.25rem">
+                <div style="text-align:center"><div class="bit-btn" id="tmod_gate" onclick="toggleTMOD('gate')">0<span class="bit-label">GATE</span></div></div>
+                <div style="text-align:center"><div class="bit-btn" id="tmod_ct" onclick="toggleTMOD('ct')">0<span class="bit-label">C/T̄</span></div></div>
+                <div style="text-align:center"><div class="bit-btn" id="tmod_m1" onclick="toggleTMOD('m1')">0<span class="bit-label">M1</span></div></div>
+                <div style="text-align:center"><div class="bit-btn" id="tmod_m0" onclick="toggleTMOD('m0')">0<span class="bit-label">M0</span></div></div>
+            </div>
+            <div id="tmodResult" class="callout callout-blue"></div>
+        </div>
+        <div class="card-2col">
+            <div class="card"><h4>TCON — TRx / TFx</h4><div class="stat-row"><span style="font-family:'JetBrains Mono';color:var(--accent2)">TRx</span><span style="font-size:0.8rem;color:#94a3b8">Timer Run bit. 1 = start, 0 = stop.</span></div><div class="stat-row"><span style="font-family:'JetBrains Mono';color:#f87171">TFx</span><span style="font-size:0.8rem;color:#94a3b8">Timer Flag. Hardware sets to 1 on overflow. Must be cleared by software (or auto-cleared by ISR).</span></div></div>
+            <div class="card"><h4>TMOD Mode Summary</h4><div class="stat-row"><span class="badge badge-blue">00</span><span style="font-size:0.8rem;color:#94a3b8">Mode 0: 13-bit timer (legacy)</span></div><div class="stat-row"><span class="badge badge-blue">01</span><span style="font-size:0.8rem;color:#94a3b8">Mode 1: 16-bit, manual reload</span></div><div class="stat-row"><span class="badge badge-green">10</span><span style="font-size:0.8rem;color:#94a3b8">Mode 2: 8-bit auto-reload (best for waves)</span></div><div class="stat-row"><span class="badge badge-amber">11</span><span style="font-size:0.8rem;color:#94a3b8">Mode 3: Split timer mode</span></div></div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w67b-irq">
+        <div class="page-title">Interrupt Management</div>
+        <p class="page-sub">IE register switchboard and the interrupt vector table.</p>
+        <div class="card-2col">
+            <div class="card" style="padding:0;overflow:hidden">
+                <div style="background:rgba(245,158,11,0.15);border-bottom:1px solid rgba(245,158,11,0.3);padding:0.75rem 1.25rem"><h3 style="margin:0;color:var(--accent3)">⚡ 5 Interrupt Vectors</h3></div>
+                <table class="styled-table">
+                    <thead><tr><th>Priority</th><th>Source</th><th>Flag</th><th>Vector</th></tr></thead>
+                    <tbody>
+                        <tr><td>1</td><td>Ext INT0 (P3.2)</td><td><code>IE0</code></td><td class="ivec">0x0003</td></tr>
+                        <tr><td>2</td><td>Timer 0</td><td><code>TF0</code></td><td class="ivec">0x000B</td></tr>
+                        <tr><td>3</td><td>Ext INT1 (P3.3)</td><td><code>IE1</code></td><td class="ivec">0x0013</td></tr>
+                        <tr><td>4</td><td>Timer 1</td><td><code>TF1</code></td><td class="ivec">0x001B</td></tr>
+                        <tr><td>5</td><td>Serial Port</td><td><code>RI/TI</code></td><td class="ivec">0x0023</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card">
+                <h3>IE Register Switchboard</h3>
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0.75rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+                    <div><span style="font-family:'JetBrains Mono';font-weight:700;color:#fff">EA</span><div style="font-size:0.7rem;color:var(--muted)">Global Enable</div></div>
+                    <label class="hw-switch"><input type="checkbox" id="ieEA" onchange="updateIE()"><span class="hw-slider"></span></label>
+                </div>
+                <div id="ieSubSwitches" style="display:flex;flex-direction:column;gap:4px;opacity:0.4;transition:opacity 0.2s;pointer-events:none">
+                    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.6rem;display:flex;justify-content:space-between;align-items:center"><span style="font-family:'JetBrains Mono';font-size:0.8rem">EX0 (Ext 0)</span><label class="hw-switch"><input type="checkbox" id="ieEX0" onchange="updateIE()"><span class="hw-slider"></span></label></div>
+                    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.6rem;display:flex;justify-content:space-between;align-items:center"><span style="font-family:'JetBrains Mono';font-size:0.8rem">ET0 (Timer 0)</span><label class="hw-switch"><input type="checkbox" id="ieET0" onchange="updateIE()"><span class="hw-slider"></span></label></div>
+                    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.6rem;display:flex;justify-content:space-between;align-items:center"><span style="font-family:'JetBrains Mono';font-size:0.8rem">EX1 (Ext 1)</span><label class="hw-switch"><input type="checkbox" id="ieEX1" onchange="updateIE()"><span class="hw-slider"></span></label></div>
+                    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.6rem;display:flex;justify-content:space-between;align-items:center"><span style="font-family:'JetBrains Mono';font-size:0.8rem">ET1 (Timer 1)</span><label class="hw-switch"><input type="checkbox" id="ieET1" onchange="updateIE()"><span class="hw-slider"></span></label></div>
+                </div>
+                <div style="margin-top:0.75rem;background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:0.6rem;font-family:'JetBrains Mono';font-size:0.82rem;color:var(--accent3)">IE = <span id="ieHex">0x00</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-view" id="w67b-scenario">
+        <div class="page-title">Intruder Alarm Scenario</div>
+        <p class="page-sub">Multiple interrupts working together: a door switch triggers a timed 1-second alarm.</p>
+        <div class="card-2col">
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+                    <h3 style="margin:0;color:#f87171">🚨 Execution Sequence</h3>
+                    <button class="btn-primary" id="alarmBtn" onclick="stepAlarm()">Trigger Door</button>
+                </div>
+                <div style="position:relative;padding-left:1.5rem">
+                    <div style="position:absolute;left:6px;top:8px;bottom:0;width:2px;background:var(--border)"></div>
+                    <div id="al0" class="timeline-step lit">
+                        <div class="timeline-dot" style="background:var(--accent)"></div>
+                        <div class="tl-title" style="color:var(--accent)">State 0: Idle</div>
+                        <div class="tl-body">Main configures INT0 for falling-edge. EA and EX0 enabled. CPU at <code>SJMP $</code>.</div>
+                    </div>
+                    <div id="al1" class="timeline-step">
+                        <div class="timeline-dot" style="background:var(--accent3)"></div>
+                        <div class="tl-title" style="color:var(--accent3)">State 1: The Trigger</div>
+                        <div class="tl-body">Door opens. INT0 drops to 0. CPU instantly jumps to vector 0x0003 (EX0ISR).</div>
+                    </div>
+                    <div id="al2" class="timeline-step">
+                        <div class="timeline-dot" style="background:#f87171"></div>
+                        <div class="tl-title" style="color:#f87171">State 2: EX0ISR Runs</div>
+                        <div class="tl-body">ISR enables ET0 & ET1, sets TR0 & TR1 to 1, returns with RETI.</div>
+                    </div>
+                    <div id="al3" class="timeline-step">
+                        <div class="timeline-dot" style="background:var(--accent2)"></div>
+                        <div class="tl-title" style="color:var(--accent2)">State 3: Timers Active</div>
+                        <div class="tl-body"><strong>Timer 1 ISR:</strong> Overflows rapidly, toggles P1.7 at 400 Hz (buzzer).<br><strong>Timer 0 ISR:</strong> Overflows every 50ms, counts to 20 = 1 second.</div>
+                    </div>
+                    <div id="al4" class="timeline-step">
+                        <div class="timeline-dot" style="background:#94a3b8"></div>
+                        <div class="tl-title" style="color:#94a3b8">State 4: Shutdown</div>
+                        <div class="tl-body">Timer 0 reaches 20 overflows. Disables both timers, silences buzzer, resets.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" style="background:#0d1117">
+                <h3 style="color:#fff;margin-bottom:0.75rem">Assembly Framework</h3>
+                <div class="code-block" style="font-size:0.72rem;line-height:1.8">
+<span class="kw">ORG</span> 0000H
+<span class="kw">LJMP</span> <span class="lbl">MAIN</span>       <span class="cmt">; Skip vectors on reset</span>
+
+<span class="kw">ORG</span> 000BH      <span class="cmt">; Timer 0 vector</span>
+<span class="kw">LJMP</span> <span class="lbl">T0ISR</span>
+
+<span class="kw">ORG</span> 0003H      <span class="cmt">; Ext INT0 vector</span>
+<span class="kw">LJMP</span> <span class="lbl">EX0ISR</span>
+
+<span class="kw">ORG</span> 0030H      <span class="cmt">; Main program above vectors</span>
+<span class="lbl">MAIN:</span>
+  <span class="kw">SETB</span> IT0     <span class="cmt">; Falling-edge trigger</span>
+  <span class="kw">MOV</span>  IE, #81H<span class="cmt">; EA=1, EX0=1</span>
+  <span class="kw">SJMP</span> $       <span class="cmt">; Idle — wait</span>
+
+<span class="lbl">EX0ISR:</span>
+  <span class="kw">MOV</span> IE, #9BH <span class="cmt">; Enable all</span>
+  <span class="kw">SETB</span> TR0
+  <span class="kw">SETB</span> TR1
+  <span class="kw">RETI</span>
+
+<span class="lbl">T0ISR:</span>
+  <span class="kw">DJNZ</span> R7, <span class="lbl">DONE</span>
+  <span class="kw">CLR</span>  TR0     <span class="cmt">; Shutdown after 1s</span>
+  <span class="kw">CLR</span>  TR1
+<span class="lbl">DONE:</span> <span class="kw">RETI</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W67B NEW: IT0/IT1 Trigger Types -->
+    <div class="section-view" id="w67b-itypes">
+        <div class="page-title">IT0/IT1 External Interrupt Triggering <span class="new-tag">ADDED</span></div>
+        <p class="page-sub">The TCON register bits IT0 and IT1 control how external interrupts are triggered. This is a critical concept often missed.</p>
+        <div class="card-2col">
+            <div class="card" style="border-color:rgba(79,142,247,0.4)">
+                <h3>IT0/IT1 = 0 — Level Triggered</h3>
+                <p style="font-size:0.83rem;color:#94a3b8;margin-bottom:0.75rem">The interrupt is <strong style="color:#fff">active as long as the pin stays LOW</strong>. If the pin is still low when the ISR finishes (RETI), the interrupt will fire again immediately.</p>
+                <div class="callout callout-amber">⚠ Must ensure the source is de-asserted before RETI, otherwise the ISR triggers in an infinite loop.</div>
+            </div>
+            <div class="card" style="border-color:rgba(52,211,153,0.4)">
+                <h3>IT0/IT1 = 1 — Falling-Edge Triggered</h3>
+                <p style="font-size:0.83rem;color:#94a3b8;margin-bottom:0.75rem">The interrupt fires <strong style="color:#fff">exactly once</strong> when the pin transitions from HIGH → LOW. The CPU samples the pin every 12 clock cycles.</p>
+                <div class="callout callout-green">✅ Preferred for most applications — single, clean trigger per event.</div>
+            </div>
+        </div>
+        <div class="card">
+            <h3>IE0/IE1 — The Interrupt Edge Flag</h3>
+            <p style="font-size:0.83rem;color:#94a3b8;margin-bottom:0.75rem">When the 8051 detects a valid external interrupt event, hardware automatically sets <code style="color:var(--accent)">IE0</code> (or IE1) to 1. When the CPU vectors to the ISR, this flag is <strong style="color:#fff">automatically cleared</strong> (for edge-triggered). For level-triggered mode, it reflects the current pin level.</p>
+            <div class="code-block" style="font-size:0.78rem">
+<span class="cmt">; Configure INT0 for falling-edge in TCON</span>
+  <span class="kw">SETB</span> IT0   <span class="cmt">; IT0 = 1 → falling-edge mode</span>
+  <span class="kw">SETB</span> EX0   <span class="cmt">; Enable External 0 interrupt</span>
+  <span class="kw">SETB</span> EA    <span class="cmt">; Enable global interrupts</span>
+
+<span class="cmt">; For level-triggered mode:</span>
+  <span class="kw">CLR</span>  IT0   <span class="cmt">; IT0 = 0 → level-triggered</span>
+            </div>
+        </div>
+    </div>
+
+</div><!-- end wk-w67b -->
+
+</main>
+</div><!-- end app-body -->
+<script>
+// ═══════ NAVIGATION ═══════
+const weekMap = {
+    w1: {view:'wk-w1', nav:'w1', firstSec:'w1-core'},
+    w4: {view:'wk-w4', nav:'w4', firstSec:'w4-loops'},
+    w56: {view:'wk-w56', nav:'w56', firstSec:'w56-hw'},
+    w67a: {view:'wk-w67a', nav:'w67a', firstSec:'w67a-basics'},
+    w67b: {view:'wk-w67b', nav:'w67b', firstSec:'w67b-mem'},
+};
+let currentWeek = 'w1';
+
+function switchWeek(w) {
+    document.querySelectorAll('.week-view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.wtab').forEach(t => t.classList.toggle('active', t.dataset.week === w));
+    document.querySelectorAll('.sb-week-nav').forEach(n => n.style.display = n.dataset.for === w ? '' : 'none');
+    document.getElementById('wk-' + w).classList.add('active');
+    currentWeek = w;
+    const firstSec = weekMap[w].firstSec;
+    document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
+    const sec = document.getElementById(firstSec);
+    if(sec) sec.classList.add('active');
+    document.querySelectorAll('.sb-btn').forEach(b => b.classList.toggle('active', b.dataset.sec === firstSec));
+    document.querySelector('.main-content').scrollTop = 0;
+}
+
+document.querySelectorAll('.wtab').forEach(t => t.addEventListener('click', () => switchWeek(t.dataset.week)));
+
+document.querySelectorAll('.sb-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const sec = btn.dataset.sec;
+        document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
+        document.getElementById(sec).classList.add('active');
+        document.querySelectorAll('.sb-btn').forEach(b => b.classList.toggle('active', b.dataset.sec === sec));
+        document.querySelector('.main-content').scrollTop = 0;
+    });
+});
+
+// ═══════ W1: EMBED TABS ═══════
+function showEmbed(id, btn) {
+    document.querySelectorAll('[id^="embed-"]').forEach(e => e.style.display = 'none');
+    document.getElementById('embed-' + id).style.display = 'grid';
+    document.querySelectorAll('#embedCatBtns button').forEach(b => b.className = 'btn-ghost');
+    btn.className = 'btn-primary';
+}
+
+// ═══════ W1: ROM TECH ═══════
+const romData = {
+    mask: {title:'80xx — Mask ROM (Factory Programmed)', desc:'Programmed permanently via photolithographic masks. Cannot be erased. Used in final, high-volume production.', badges:['badge-green:✓ Cheapest in volume','badge-red:✗ Permanent — no field updates']},
+    uveprom: {title:'87xx — UV-EPROM', desc:'Erase: 15–20 min of UV light through a physical quartz window. Program via 12.5V on V_pp. Part prefix: 27xxx. Cannot be programmed on system board.', badges:['badge-amber:~1,000 cycles','badge-red:✗ Slow erase off-board']},
+    flash: {title:'89xx — Flash EEPROM', desc:'Electrically erased in under 1 second (entire chip). ~100ns access time. 100,000+ program/erase cycles. Can be programmed in-system. Modern standard.', badges:['badge-green:100K+ cycles','badge-green:✓ Fast in-system reprogramming']},
+    nvram: {title:'DS5000 — NV-RAM (Dallas)', desc:'SRAM + internal lithium battery. Detects Vcc loss and switches to battery instantly. Byte-level changes. Includes a real-time clock (RTC). Virtually infinite cycles.', badges:['badge-pink:∞ Virtually unlimited cycles','badge-green:✓ Retains data on power-off']},
+};
+function showRom(key, btn) {
+    const d = romData[key];
+    document.getElementById('romContent').innerHTML = `<h4>${d.title}</h4><p style="font-size:0.83rem;color:#94a3b8;margin-bottom:0.75rem">${d.desc}</p><div style="display:flex;gap:0.5rem;flex-wrap:wrap">${d.badges.map(b=>{const[cls,txt]=b.split(':');return`<span class="badge ${cls}">${txt}</span>`;}).join('')}</div>`;
+    document.querySelectorAll('#romBtns button').forEach(b => b.className = 'btn-ghost');
+    btn.className = 'btn-primary';
+}
+
+// ═══════ W1: ARCHITECTURE ═══════
+function showArch(type) {
+    const h = type === 'harvard';
+    document.getElementById('archTitle').textContent = h ? 'Harvard Architecture' : 'Princeton (Von-Neumann) Architecture';
+    document.getElementById('archDesc').innerHTML = h
+        ? 'Uses <strong style="color:#fff">separate</strong> memory blocks and buses for Code and Data. CPU can fetch both simultaneously — faster.'
+        : 'Uses a <strong style="color:#fff">shared</strong> single memory and one bus for both Code and Data. CPU must fetch them sequentially.';
+    document.getElementById('btnHarvard').className = h ? 'toggle-btn active' : 'toggle-btn';
+    document.getElementById('btnPrinceton').className = h ? 'toggle-btn' : 'toggle-btn active';
+    document.getElementById('archMemInst').style.display = h ? '' : 'none';
+    document.getElementById('archBus1').style.display = h ? '' : 'none';
+    if(!h) {
+        document.getElementById('archMemData').textContent = 'Shared Memory';
+        document.getElementById('archMemData').style.background = 'rgba(245,158,11,0.15)';
+        document.getElementById('archMemData').style.borderColor = 'rgba(245,158,11,0.3)';
+        document.getElementById('archMemData').style.color = '#fcd34d';
+    } else {
+        document.getElementById('archMemData').innerHTML = 'Data<br>Memory (RAM)';
+        document.getElementById('archMemData').style.background = 'rgba(52,211,153,0.15)';
+        document.getElementById('archMemData').style.borderColor = 'rgba(52,211,153,0.3)';
+        document.getElementById('archMemData').style.color = '#6ee7b7';
+    }
+}
+
+// ═══════ W1: OPCODE FETCH ═══════
+let fetchStep = 0;
+function stepFetch() {
+    fetchStep = fetchStep >= 4 ? 1 : fetchStep + 1;
+    const hl = (el, type='a') => {
+        const e = document.getElementById(el);
+        if(type==='a') { e.style.borderColor='var(--accent)'; e.style.background='rgba(79,142,247,0.15)'; e.style.color='#93c5fd'; }
+        else if(type==='g') { e.style.borderColor='rgba(52,211,153,0.5)'; e.style.background='rgba(52,211,153,0.1)'; e.style.color='#6ee7b7'; }
+        else { e.style.borderColor='var(--border)'; e.style.background='var(--surface2)'; e.style.color='var(--muted)'; }
+    };
+    ['fABus','fCBus','fDBus'].forEach(e => hl(e,'n'));
+    ['fPC','fIR'].forEach(e => {document.getElementById(e).style.borderColor='var(--border)'; document.getElementById(e).style.background='var(--surface)'; document.getElementById(e).style.color='var(--text)';});
+    document.getElementById('fMemTarget').style.background='var(--surface)'; document.getElementById('fMemTarget').style.borderColor='var(--border)'; document.getElementById('fMemTarget').style.color='var(--text)';
+    const descs = ['','Step 1: PC outputs address 0x0042 onto the Address Bus.','Step 2: CPU sends a READ signal via the Control Bus.','Step 3: Memory places the opcode at 0042 onto the Data Bus.','Step 4: CPU reads Data Bus and loads opcode into Instruction Register (IR). Fetch complete!'];
+    document.getElementById('fetchDesc').textContent = descs[fetchStep];
+    document.getElementById('fetchBtn').textContent = fetchStep < 4 ? `▶ Step ${fetchStep+1}` : '↺ Restart';
+    if(fetchStep===1) { hl('fPC','a'); hl('fABus','a'); }
+    if(fetchStep===2) { hl('fCBus','a'); document.getElementById('fMemTarget').style.background='rgba(79,142,247,0.12)'; document.getElementById('fMemTarget').style.color='#93c5fd'; }
+    if(fetchStep===3) { hl('fDBus','g'); document.getElementById('fMemTarget').style.background='rgba(52,211,153,0.15)'; document.getElementById('fMemTarget').style.color='#6ee7b7'; }
+    if(fetchStep===4) { hl('fDBus','g'); hl('fIR','a'); fetchStep=0; }
+}
+
+// ═══════ W1: MACHINE CYCLE CALC ═══════
+function calcMC() {
+    const f = parseFloat(document.getElementById('mcFreq').value);
+    if(f>0){ document.getElementById('mcTosc').textContent = (1/f).toFixed(3)+' µs'; document.getElementById('mcTime').textContent = (12/f).toFixed(3)+' µs'; }
+}
+
+// ═══════ W1: PINOUT ═══════
+const pinData = {
+    1:{n:'P1.0',a:'',d:'Port 1, Bit 0. General-purpose I/O.'},2:{n:'P1.1',a:'',d:'Port 1, Bit 1. General-purpose I/O.'},3:{n:'P1.2',a:'',d:'Port 1, Bit 2.'},4:{n:'P1.3',a:'',d:'Port 1, Bit 3.'},5:{n:'P1.4',a:'',d:'Port 1, Bit 4.'},6:{n:'P1.5',a:'',d:'Port 1, Bit 5.'},7:{n:'P1.6',a:'',d:'Port 1, Bit 6.'},8:{n:'P1.7',a:'',d:'Port 1, Bit 7.'},
+    9:{n:'RST',a:'',d:'Reset. High for 2 machine cycles resets the MCU.'},
+    10:{n:'P3.0',a:'RXD',d:'Serial Data Receive pin.'},11:{n:'P3.1',a:'TXD',d:'Serial Data Transmit.'},12:{n:'P3.2',a:'INT0',d:'External Interrupt 0 input.'},13:{n:'P3.3',a:'INT1',d:'External Interrupt 1 input.'},14:{n:'P3.4',a:'T0',d:'Timer 0 external input.'},15:{n:'P3.5',a:'T1',d:'Timer 1 external input.'},16:{n:'P3.6',a:'WR̅',d:'External Data Memory Write strobe.'},17:{n:'P3.7',a:'RD̅',d:'External Data Memory Read strobe.'},
+    18:{n:'XTAL2',a:'',d:'Output from inverting oscillator amplifier.'},19:{n:'XTAL1',a:'',d:'Input to inverting oscillator amplifier.'},20:{n:'GND',a:'',d:'Ground.'},
+    21:{n:'P2.0',a:'A8',d:'Port 2, Bit 0. High byte of address bus.'},22:{n:'P2.1',a:'A9',d:'Port 2, Bit 1.'},23:{n:'P2.2',a:'A10',d:'Port 2, Bit 2.'},24:{n:'P2.3',a:'A11',d:'Port 2, Bit 3.'},25:{n:'P2.4',a:'A12',d:'Port 2, Bit 4.'},26:{n:'P2.5',a:'A13',d:'Port 2, Bit 5.'},27:{n:'P2.6',a:'A14',d:'Port 2, Bit 6.'},28:{n:'P2.7',a:'A15',d:'Port 2, Bit 7.'},
+    29:{n:'PSEN̅',a:'',d:'Program Store Enable. Read signal for external ROM.'},30:{n:'ALE',a:'PROG̅',d:'Address Latch Enable. Demultiplexes P0 address/data.'},31:{n:'EA̅',a:'VPP',d:'External Access Enable. Tie low to run external code.'},
+    32:{n:'P0.7',a:'AD7',d:'Port 0, Bit 7. Multiplexed address/data.'},33:{n:'P0.6',a:'AD6',d:'Port 0, Bit 6.'},34:{n:'P0.5',a:'AD5',d:'Port 0, Bit 5.'},35:{n:'P0.4',a:'AD4',d:'Port 0, Bit 4.'},36:{n:'P0.3',a:'AD3',d:'Port 0, Bit 3.'},37:{n:'P0.2',a:'AD2',d:'Port 0, Bit 2.'},38:{n:'P0.1',a:'AD1',d:'Port 0, Bit 1.'},39:{n:'P0.0',a:'AD0',d:'Port 0, Bit 0.'},40:{n:'VCC',a:'',d:'+5V Power Supply.'}
+};
+
+function initPins() {
+    const left = document.getElementById('pinsLeft');
+    const right = document.getElementById('pinsRight');
+    for(let i=1; i<=20; i++) {
+        left.innerHTML += `<div class="pin-row" onmouseenter="hoverPin(${i}, this)"><div class="pin-text">${i} ${pinData[i].n}</div><div class="pin-contact"></div></div>`;
+    }
+    for(let i=40; i>=21; i--) {
+        right.innerHTML += `<div class="pin-row" onmouseenter="hoverPin(${i}, this)"><div class="pin-contact"></div><div class="pin-text">${pinData[i].n} ${i}</div></div>`;
+    }
+}
+
+function hoverPin(num, el) {
+    document.querySelectorAll('.pin-row').forEach(r => r.classList.remove('sel'));
+    el.classList.add('sel');
+    const data = pinData[num];
+    document.getElementById('pinNumBadge').textContent = '#' + num;
+    document.getElementById('pinNameDisplay').textContent = data.n;
+    if(data.a) {
+        document.getElementById('pinAltWrap').style.display = 'block';
+        document.getElementById('pinAlt').textContent = data.a;
+    } else {
+        document.getElementById('pinAltWrap').style.display = 'none';
+    }
+    document.getElementById('pinDesc').textContent = data.d;
+}
+
+// ═══════ W4: SHORT JUMPS ═══════
+function calcJump() {
+    const pcHex = document.getElementById('jmpPC').value;
+    const relHex = document.getElementById('jmpRel').value;
+    const pc = parseInt(pcHex, 16);
+    let rel = parseInt(relHex, 16);
+    if(isNaN(pc) || isNaN(rel)) return;
+    if (rel > 127) rel = rel - 256; // 8-bit signed two's complement
+    let target = pc + rel;
+    if (target < 0) target += 65536;
+    if (target > 65535) target -= 65536;
+    document.getElementById('jmpResult').textContent = '0x' + target.toString(16).toUpperCase().padStart(4, '0');
+}
+
+// ═══════ W4: STACK SIMULATOR ═══════
+let stack = [];
+let sp = 7;
+function updateStackUI() {
+    const ui = document.getElementById('stackUI');
+    document.getElementById('spVal').textContent = sp.toString(16).toUpperCase().padStart(2, '0');
+    ui.innerHTML = '';
+    if(stack.length === 0) {
+        ui.innerHTML = '<div class="stack-empty">— Base (07H) —</div>';
+    } else {
+        stack.forEach((item, index) => {
+            const addr = (7 + index + 1).toString(16).toUpperCase().padStart(2, '0') + 'H';
+            const cls = item.includes('PC') ? 'stack-item-pc' : 'stack-item-reg';
+            ui.innerHTML = `<div class="stack-item ${cls}"><span>${addr}</span><span>${item}</span></div>` + ui.innerHTML;
+        });
+    }
+    document.getElementById('btnRet').disabled = stack.length === 0;
+    document.getElementById('btnPop').disabled = stack.length === 0;
+    document.getElementById('btnCall').disabled = stack.length >= 5;
+    document.getElementById('btnPush').disabled = stack.length >= 5;
+}
+
+function stackCall() {
+    sp += 2;
+    stack.push('PC (Low)');
+    stack.push('PC (High)');
+    updateStackUI();
+}
+function stackRet() {
+    if(stack.length >= 2) {
+        sp -= 2;
+        stack.pop();
+        stack.pop();
+        updateStackUI();
+    }
+}
+function stackPush() {
+    sp += 1;
+    stack.push('R4 Data');
+    updateStackUI();
+}
+function stackPop() {
+    if(stack.length >= 1) {
+        sp -= 1;
+        stack.pop();
+        updateStackUI();
+    }
+}
+
+// ═══════ W4: TIMING ═══════
+function calcDelay() {
+    const f = parseFloat(document.getElementById('delayFreq').value);
+    const mcs = parseInt(document.getElementById('delayMC').value);
+    if(f > 0) {
+        const t1mc = (12 / f);
+        document.getElementById('d1mc').textContent = t1mc.toFixed(3) + ' µs';
+        document.getElementById('dTotal').textContent = (t1mc * mcs).toFixed(3) + ' µs';
+    }
+}
+
+function calcNested() {
+    const f = parseFloat(document.getElementById('nlFreq').value);
+    const outer = parseInt(document.getElementById('nlOuter').value) || 0;
+    const inner = parseInt(document.getElementById('nlInner').value) || 0;
+    document.getElementById('nlCodeR2').textContent = outer;
+    document.getElementById('nlCodeR3').textContent = inner;
+    if(f > 0) {
+        const mcTime = (12 / f); // in us
+        // Approx: outer * (inner * 4 + 2)
+        const totalMcs = outer * (inner * 4 + 2);
+        const totalUs = totalMcs * mcTime;
+        document.getElementById('nlTotal').textContent = (totalUs / 1000).toFixed(2) + ' ms';
+    }
+}
+
+// ═══════ W4: OVEN I/O ═══════
+function updateOven() {
+    const safe = document.getElementById('ovenToggle').checked; // Checked = HIGH (safe), Unchecked = LOW (alarm)
+    if(safe) {
+        document.getElementById('ovenStatusTxt').textContent = 'SAFE';
+        document.getElementById('ovenStatusTxt').style.color = 'var(--accent2)';
+        document.getElementById('buzzerUI').style.borderColor = 'var(--border)';
+        document.getElementById('buzzerIcon').textContent = '🔕';
+        document.getElementById('buzzerIcon').style.background = 'var(--surface)';
+        document.getElementById('ovenL1').style.borderLeftColor = 'var(--accent)';
+        document.getElementById('ovenL1').style.background = 'rgba(79,142,247,0.1)';
+        [2,3,4,5].forEach(i => {
+            document.getElementById('ovenL'+i).style.borderLeftColor = 'transparent';
+            document.getElementById('ovenL'+i).style.background = 'transparent';
+            document.getElementById('ovenL'+i).style.color = 'var(--muted)';
+        });
+    } else {
+        document.getElementById('ovenStatusTxt').textContent = 'HOT!';
+        document.getElementById('ovenStatusTxt').style.color = '#ef4444';
+        document.getElementById('buzzerUI').style.borderColor = '#ef4444';
+        document.getElementById('buzzerIcon').textContent = '🔔';
+        document.getElementById('buzzerIcon').style.background = 'rgba(239,68,68,0.2)';
+        document.getElementById('ovenL1').style.borderLeftColor = 'transparent';
+        document.getElementById('ovenL1').style.background = 'transparent';
+        [2,3,4,5].forEach(i => {
+            document.getElementById('ovenL'+i).style.color = 'var(--text)';
+        });
+    }
+}
+
+// ═══════ W56: EA PIN ═══════
+function showEA(state) {
+    const high = state === 'high';
+    document.getElementById('eaHigh').className = high ? 'toggle-btn active' : 'toggle-btn';
+    document.getElementById('eaLow').className = high ? 'toggle-btn' : 'toggle-btn active';
+    document.getElementById('eaDesc').innerHTML = high 
+        ? 'When <strong style="color:#fff">EA = 1 (High)</strong>: 8051 executes from internal 4 KB ROM (0000H–0FFFH). When PC exceeds 0FFFH, it automatically switches to external ROM.'
+        : 'When <strong style="color:#fff">EA = 0 (Low)</strong>: 8051 forces ALL code fetches from external ROM (0000H–FFFFH). Internal ROM is ignored.';
+}
+
+// ═══════ W56: MEMORY MAP & SFR ═══════
+const memData = {
+    sfr: { title: 'SFR Space (80H–FFH)', desc: 'Special Function Registers. Direct addressing only. Contains ACC, B, PSW, TMOD, etc.'},
+    scratch: { title: 'Scratch Pad RAM (30H–7FH)', desc: 'General purpose data storage. Typically used for stack and user variables.'},
+    bit: { title: 'Bit-Addressable RAM (20H–2FH)', desc: '16 bytes providing 128 individual addressable bits (00H to 7FH).'},
+    banks: { title: 'Register Banks (00H–1FH)', desc: '32 bytes split into 4 banks of 8 registers (R0–R7). Active bank selected by RS1, RS0 in PSW.'}
+};
+
+function showMem(type, el) {
+    document.querySelectorAll('.mem-block').forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+    const d = memData[type];
+    document.getElementById('memDetail').innerHTML = `<h4>${d.title}</h4><p style="font-size:0.83rem;color:#94a3b8;margin:0">${d.desc}</p>`;
+}
+
+function showMem2(type, el) {
+    const rawType = type.replace('2', '');
+    document.querySelectorAll('#w67b-mem .mem-block').forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+    const d = memData[rawType];
+    document.getElementById('memDetail2').innerHTML = `<h4>${d.title}</h4><p style="font-size:0.83rem;color:#94a3b8;margin:0">${d.desc}</p>`;
+}
+
+let pswState = { rs1: 0, rs0: 0 };
+function togglePSW(bit) {
+    pswState[bit] = pswState[bit] ? 0 : 1;
+    const btn = document.getElementById('psw_' + bit);
+    btn.classList.toggle('on', pswState[bit]);
+    btn.innerHTML = `${pswState[bit]}<span class="bit-label">${bit.toUpperCase()}</span>`;
+    
+    const bankNum = (pswState.rs1 << 1) | pswState.rs0;
+    const ranges = ['00H–07H', '08H–0FH', '10H–17H', '18H–1FH'];
+    document.getElementById('pswStatus').innerHTML = `Active Register Bank: <strong>Bank ${bankNum}</strong> (${ranges[bankNum]}). No arithmetic flags set.`;
+}
+
+function togglePSW2(bit) {
+    pswState[bit] = pswState[bit] ? 0 : 1;
+    const btn = document.getElementById('psw2_' + bit);
+    btn.classList.toggle('on', pswState[bit]);
+    btn.innerHTML = `${pswState[bit]}<span class="bit-label">${bit.toUpperCase()}</span>`;
+    
+    const bankNum = (pswState.rs1 << 1) | pswState.rs0;
+    const ranges = ['00H–07H', '08H–0FH', '10H–17H', '18H–1FH'];
+    document.getElementById('psw2Status').innerHTML = `Active: <strong>Bank ${bankNum}</strong> (${ranges[bankNum]})`;
+}
+
+// ═══════ W56: TIMERS ═══════
+function calcTimerFreq() {
+    const f = parseFloat(document.getElementById('timerFreq').value);
+    if(f > 0) {
+        document.getElementById('tClk').textContent = (1/f).toFixed(3) + ' µs';
+        document.getElementById('tMC').textContent = (12/f).toFixed(3) + ' µs';
+    }
+}
+
+let simCount = 253; // Start near overflow (FD)
+function simStep() {
+    const reload = parseInt(document.getElementById('simTH1').value, 16) || 0;
+    simCount++;
+    if(simCount > 255) {
+        simCount = reload;
+        document.getElementById('simTF1').textContent = '1';
+        document.getElementById('simTF1').classList.add('tf-active');
+        setTimeout(() => {
+            document.getElementById('simTF1').textContent = '0';
+            document.getElementById('simTF1').classList.remove('tf-active');
+        }, 1000);
+    }
+    document.getElementById('simTL1').textContent = simCount.toString(16).toUpperCase().padStart(2, '0');
+}
+
+function simReset() {
+    simCount = parseInt(document.getElementById('simTH1').value, 16) || 0;
+    document.getElementById('simTL1').textContent = simCount.toString(16).toUpperCase().padStart(2, '0');
+    document.getElementById('simTF1').textContent = '0';
+    document.getElementById('simTF1').classList.remove('tf-active');
+}
+
+// ═══════ W56: C LAB ═══════
+function updateLab() {
+    const sw = document.getElementById('labSwitch').checked;
+    document.getElementById('labSwVal').textContent = sw ? '1' : '0';
+    document.getElementById('labCodeIf').style.borderLeftColor = sw ? 'transparent' : 'var(--accent)';
+    document.getElementById('labCodeElse').style.borderLeftColor = sw ? 'var(--accent)' : 'transparent';
+    
+    if(!sw) {
+        document.getElementById('labLED').style.background = 'var(--accent4)';
+        document.getElementById('labLED').style.borderColor = 'var(--accent4)';
+        document.getElementById('labLED').style.boxShadow = '0 0 15px rgba(244,114,182,0.5)';
+        document.getElementById('labLEDVal').textContent = '1';
+        document.getElementById('labCodeOn').style.borderLeftColor = 'var(--accent)';
+        document.getElementById('labCodeOff').style.borderLeftColor = 'transparent';
+    } else {
+        document.getElementById('labLED').style.background = '#374151';
+        document.getElementById('labLED').style.borderColor = '#4b5563';
+        document.getElementById('labLED').style.boxShadow = 'none';
+        document.getElementById('labLEDVal').textContent = '0';
+        document.getElementById('labCodeOn').style.borderLeftColor = 'transparent';
+        document.getElementById('labCodeOff').style.borderLeftColor = 'var(--accent)';
+    }
+}
+
+// ═══════ W67A: MEMORY ═══════
+function calcMem() {
+    const a = parseInt(document.getElementById('memAddr').value);
+    const d = parseInt(document.getElementById('memData').value);
+    if(a > 0 && d > 0) {
+        const locs = Math.pow(2, a);
+        const bits = locs * d;
+        const bytes = bits / 8;
+        
+        document.getElementById('memLocs').textContent = locs.toLocaleString();
+        
+        if(bits >= 1048576) document.getElementById('memBits').textContent = (bits/1048576).toFixed(1) + ' Mbits';
+        else if(bits >= 1024) document.getElementById('memBits').textContent = (bits/1024).toFixed(0) + ' Kbits';
+        else document.getElementById('memBits').textContent = bits + ' bits';
+        
+        if(bytes >= 1048576) document.getElementById('memBytes').textContent = (bytes/1048576).toFixed(1) + ' MB';
+        else if(bytes >= 1024) document.getElementById('memBytes').textContent = (bytes/1024).toFixed(0) + ' KB';
+        else document.getElementById('memBytes').textContent = bytes + ' Bytes';
+    }
+}
+
+// ═══════ W67A: DECODER ═══════
+function updateDecoder() {
+    const a = document.getElementById('decA').checked ? 1 : 0;
+    const b = document.getElementById('decB').checked ? 1 : 0;
+    const c = document.getElementById('decC').checked ? 1 : 0;
+    const val = (c << 2) | (b << 1) | a;
+    
+    let html = '';
+    for(let i=0; i<8; i++) {
+        const active = i === val;
+        const cls = active ? 'dec-out hot' : 'dec-out';
+        const txt = active ? '0' : '1';
+        html += `<div class="${cls}">Y${i} = ${txt}</div>`;
+    }
+    document.getElementById('decOutputs').innerHTML = html;
+    
+    const start = (val * 4096).toString(16).toUpperCase().padStart(4, '0') + 'H';
+    const end = (val * 4096 + 4095).toString(16).toUpperCase().padStart(4, '0') + 'H';
+    document.getElementById('decRange').innerHTML = `<strong>Selected:</strong> ${start}–${end} (4 KB block)`;
+}
+
+// ═══════ W67A: ALE ═══════
+let aleStep = 0;
+function stepALE() {
+    aleStep++;
+    const p0 = document.getElementById('aleP0');
+    const ale = document.getElementById('aleALE');
+    const psen = document.getElementById('alePSEN');
+    const latch = document.getElementById('aleLatch');
+    const latchVal = document.getElementById('aleLatchVal');
+    const dBus = document.getElementById('aleDataBus');
+    const rom = document.getElementById('aleROM');
+    const btn = document.getElementById('aleBtn');
+    const desc = document.getElementById('aleDesc');
+
+    if(aleStep === 1) {
+        p0.textContent = 'Port 0: A0-A7 (0x42)';
+        p0.style.color = '#fcd34d'; p0.style.borderColor = '#fcd34d';
+        ale.textContent = 'ALE: 1'; ale.style.color = 'var(--accent2)'; ale.style.borderColor = 'var(--accent2)';
+        latch.style.borderColor = 'var(--accent2)';
+        latchVal.textContent = 'Pass-thru';
+        btn.textContent = 'Step 2: Latch Address';
+        desc.textContent = 'CPU places lower address (0x42) on Port 0. ALE pulses HIGH, allowing the 74LS373 latch to pass the address through.';
+    }
+    else if(aleStep === 2) {
+        ale.textContent = 'ALE: 0'; ale.style.color = 'var(--muted)'; ale.style.borderColor = '#374151';
+        latch.style.borderColor = '#0f766e';
+        latchVal.textContent = 'Latched: 0x42';
+        p0.textContent = 'Port 0: Float (Input)';
+        p0.style.color = 'var(--muted)'; p0.style.borderColor = '#374151';
+        btn.textContent = 'Step 3: Read Enable';
+        desc.textContent = 'ALE goes LOW. The latch freezes the address (0x42) for the ROM. Port 0 is now free to act as a data bus.';
+    }
+    else if(aleStep === 3) {
+        psen.textContent = 'PSEN: 0'; psen.style.color = 'var(--accent4)'; psen.style.borderColor = 'var(--accent4)';
+        rom.style.borderColor = 'var(--accent4)'; rom.innerHTML = 'Data Out: 0x74';
+        dBus.textContent = 'D0-D7 = 0x74'; dBus.style.color = 'var(--accent)'; dBus.style.borderColor = 'var(--accent)';
+        p0.textContent = 'Port 0: Reading 0x74'; p0.style.color = 'var(--accent)'; p0.style.borderColor = 'var(--accent)';
+        btn.textContent = 'Reset Cycle';
+        desc.textContent = 'PSEN pulses LOW, enabling ROM output. ROM places instruction (0x74) on the bus. CPU reads it via Port 0.';
+    }
+    else {
+        aleStep = 0;
+        p0.textContent = 'Port 0: High-Z'; p0.style.color = 'var(--muted)'; p0.style.borderColor = '#374151';
+        ale.textContent = 'ALE: 0';
+        psen.textContent = 'PSEN: 1'; psen.style.color = 'var(--muted)'; psen.style.borderColor = '#374151';
+        latchVal.textContent = 'Empty';
+        dBus.textContent = 'D0–D7 idle'; dBus.style.color = 'var(--muted)'; dBus.style.borderColor = '#374151';
+        rom.style.borderColor = '#7c2d12'; rom.innerHTML = 'Data Out: —';
+        btn.textContent = 'Step 1: Output Address';
+        desc.textContent = 'Click the button to simulate the external memory fetch cycle step by step.';
+    }
+}
+
+// ═══════ W67A: EA MAPS ═══════
+function updateEAMap() {
+    const mcu = document.getElementById('eaMCU').value;
+    const ea = document.getElementById('eaPIN').value;
+    const viz = document.getElementById('eaMapViz');
+    const note = document.getElementById('eaNote');
+    
+    let intKB = 0;
+    if(mcu === '8051') intKB = 4;
+    if(mcu === '8052') intKB = 8;
+    
+    viz.innerHTML = '';
+    
+    if(ea === 'gnd' || intKB === 0) {
+        viz.innerHTML = `<div style="flex:1;background:rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;color:#fcd34d;font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;text-align:center">64 KB<br>External ROM</div>`;
+        note.innerHTML = ea === 'gnd' ? 'EA is LOW. <strong>All</strong> code is fetched from external memory.' : '8031 has NO internal ROM. EA must be tied LOW.';
+        document.getElementById('eaBoundary').style.display = 'none';
+    } else {
+        const intPct = (intKB / 64) * 100;
+        viz.innerHTML = `
+            <div style="height:${intPct}%;background:rgba(79,142,247,0.3);display:flex;align-items:center;justify-content:center;color:#93c5fd;font-family:'Syne',sans-serif;font-weight:700;font-size:0.75rem;border-bottom:1px dashed var(--accent)">${intKB}KB Int</div>
+            <div style="flex:1;background:rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;color:#fcd34d;font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;text-align:center">${64-intKB} KB<br>Ext</div>
+        `;
+        note.innerHTML = `EA is HIGH. The first ${intKB} KB is executed from the chip. Remaining address space goes external.`;
+        document.getElementById('eaBoundary').style.display = 'block';
+        document.getElementById('eaBoundary').textContent = intKB === 4 ? '0FFFH' : '1FFFH';
+    }
+}
+
+// ═══════ W67A: MOVX STEPPER ═══════
+let mxStep = -1;
+let mxR5 = 10;
+let mxDPTR = 0;
+let mxR0 = 48; // 30H
+let mxA = 0;
+const extMem = [0x55, 0xAA, 0x12, 0x34, 0x77, 0x88, 0x99, 0xBB, 0xCC, 0xDD];
+let intMem = new Array(10).fill('00');
+
+function stepMOVX() {
+    const hl = (n) => {
+        for(let i=0; i<=7; i++) {
+            document.getElementById('mc'+i).style.borderLeftColor = (i===n) ? 'var(--accent)' : 'transparent';
+            document.getElementById('mc'+i).style.color = (i===n) ? 'var(--text)' : '#6e7681';
+        }
+    };
+    
+    mxStep++;
+    if(mxStep === 0) { hl(0); mxDPTR = 0; document.getElementById('movxDPTR').textContent = '0000H'; }
+    else if(mxStep === 1) { hl(1); mxR5 = 10; document.getElementById('movxR5').textContent = '0AH'; }
+    else if(mxStep === 2) { hl(2); mxR0 = 48; document.getElementById('movxR0').textContent = '30H'; }
+    else if(mxStep === 3) { 
+        hl(3); 
+        mxA = extMem[mxDPTR]; 
+        document.getElementById('movxA').textContent = mxA.toString(16).toUpperCase().padStart(2, '0') + 'H';
+        document.getElementById('movxLog').textContent = `Read ${document.getElementById('movxA').textContent} from Ext ROM.`;
+    }
+    else if(mxStep === 4) { 
+        hl(4); 
+        intMem[mxR0 - 48] = mxA.toString(16).toUpperCase().padStart(2, '0');
+        renderIntRAM();
+        document.getElementById('movxLog').textContent = `Wrote to Int RAM at ${mxR0.toString(16).toUpperCase()}H.`;
+    }
+    else if(mxStep === 5) { hl(5); mxDPTR++; document.getElementById('movxDPTR').textContent = mxDPTR.toString(16).toUpperCase().padStart(4, '0') + 'H'; }
+    else if(mxStep === 6) { hl(6); mxR0++; document.getElementById('movxR0').textContent = mxR0.toString(16).toUpperCase() + 'H'; }
+    else if(mxStep === 7) { 
+        hl(7); 
+        mxR5--; 
+        document.getElementById('movxR5').textContent = mxR5.toString(16).toUpperCase().padStart(2, '0') + 'H';
+        if(mxR5 > 0) {
+            mxStep = 2; // Will jump to 3 on next click
+            document.getElementById('movxLog').textContent = `R5 != 0. Looping back.`;
+        } else {
+            document.getElementById('movxLog').textContent = `R5 = 0. Copy complete!`;
+            document.getElementById('movxBtn').textContent = 'Reset';
+        }
+    }
+    else {
+        mxStep = -1;
+        mxR5 = 10; mxDPTR = 0; mxR0 = 48; mxA = 0;
+        intMem.fill('00');
+        ['DPTR','R5','R0','A'].forEach(id => document.getElementById('movx'+id).textContent = '—');
+        renderIntRAM();
+        document.getElementById('movxBtn').textContent = 'Step Execute';
+        document.getElementById('movxLog').textContent = 'Ready.';
+        hl(-1);
+    }
+}
+
+function renderIntRAM() {
+    let h = '';
+    for(let i=0; i<10; i++) {
+        h += `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px"><div style="color:var(--muted);font-size:0.6rem">3${i}H</div><div style="color:var(--accent2)">${intMem[i]}</div></div>`;
+    }
+    document.getElementById('movxRAM').innerHTML = h;
+}
+
+// ═══════ W67B: TIMING ═══════
+function calcT2() {
+    const f = parseFloat(document.getElementById('t2Freq').value);
+    if(f > 0) {
+        const mc = 12 / f;
+        document.getElementById('t2Clk').textContent = (1/f).toFixed(3) + ' µs';
+        document.getElementById('t2MC').textContent = mc.toFixed(3) + ' µs';
+        document.getElementById('t2Row1').textContent = mc.toFixed(3) + ' µs';
+        document.getElementById('t2Row2').textContent = (mc * 2).toFixed(3) + ' µs';
+        document.getElementById('t2Row4').textContent = (mc * 4).toFixed(3) + ' µs';
+    }
+}
+
+// ═══════ W67B: TMOD ═══════
+let tmodState = { gate:0, ct:0, m1:0, m0:0 };
+function toggleTMOD(bit) {
+    tmodState[bit] = tmodState[bit] ? 0 : 1;
+    const btn = document.getElementById('tmod_' + bit);
+    btn.classList.toggle('on', tmodState[bit]);
+    btn.innerHTML = `${tmodState[bit]}<span class="bit-label">${bit.toUpperCase()}</span>`;
+    
+    let mode = (tmodState.m1 << 1) | tmodState.m0;
+    let modeTxt = ['0 (13-bit)', '1 (16-bit)', '2 (8-bit Auto-Reload)', '3 (Split)'][mode];
+    let src = tmodState.ct ? 'Counter (External pin T0)' : 'Timer (Internal clock)';
+    let ctrl = tmodState.gate ? 'Requires TR0=1 AND INT0 pin HIGH' : 'Requires TR0=1 only';
+    
+    document.getElementById('tmodResult').innerHTML = `<strong>Mode:</strong> ${modeTxt}<br><strong>Source:</strong> ${src}<br><strong>Control:</strong> ${ctrl}`;
+}
+
+// ═══════ W67B: IE REG ═══════
+function updateIE() {
+    const ea = document.getElementById('ieEA').checked;
+    document.getElementById('ieSubSwitches').style.opacity = ea ? '1' : '0.4';
+    document.getElementById('ieSubSwitches').style.pointerEvents = ea ? 'auto' : 'none';
+    
+    let val = 0;
+    if(ea) val |= 0x80;
+    if(document.getElementById('ieET1').checked && ea) val |= 0x08;
+    if(document.getElementById('ieEX1').checked && ea) val |= 0x04;
+    if(document.getElementById('ieET0').checked && ea) val |= 0x02;
+    if(document.getElementById('ieEX0').checked && ea) val |= 0x01;
+    
+    document.getElementById('ieHex').textContent = '0x' + val.toString(16).toUpperCase().padStart(2, '0');
+}
+
+// ═══════ W67B: ALARM SCENARIO ═══════
+let alStep = 0;
+function stepAlarm() {
+    alStep++;
+    if(alStep > 4) alStep = 0;
+    
+    for(let i=0; i<=4; i++) {
+        document.getElementById('al'+i).classList.toggle('lit', i <= alStep);
+    }
+    
+    const btn = document.getElementById('alarmBtn');
+    if(alStep === 0) btn.textContent = 'Trigger Door';
+    else if(alStep === 1) btn.textContent = 'Run EX0ISR';
+    else if(alStep === 2) btn.textContent = 'Simulate 1 Second';
+    else if(alStep === 3) btn.textContent = 'Trigger Shutdown';
+    else if(alStep === 4) btn.textContent = 'Reset Scenario';
+}
+
+// Initialize on load
+window.onload = () => {
+    initPins();
+    renderIntRAM();
+    updateDecoder();
+    toggleTMOD('fake'); // to init display
+    toggleTMOD('fake'); 
+};
+</script>
+</body>
+</html>
