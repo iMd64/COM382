@@ -54,11 +54,11 @@ const audioState = {
     playing: false,
     currentWeek: null,
     files: {
-        'w1': { name: 'Week 1 Audio', url: './assets/W1 Audio.mp3' },
-        'w4': { name: 'Week 4 Audio', url: './assets/W4 Audio.mp3' },
-        'w56': { name: 'Week 5-6 Audio', url: './assets/W56 Audio.mp3' },
-        'w67a': { name: 'Week 6-7 (Mem) Audio', url: './assets/W67a Audio.mp3' },
-        'w67b': { name: 'Week 6-7 (IRQ) Audio', url: './assets/W67b Audio.mp3' }
+        'w1': { name: 'Week 1 Audio', url: './assets/W1 Audio Overview.mp3' },
+        'w4': { name: 'Week 4 Audio', url: './assets/W4 Audio Overview.mp3' },
+        'w56': { name: 'Week 5-6 Audio', url: './assets/W5-6 Audio Overview.mp3' },
+        'w67a': { name: 'Week 6-7 (Mem) Audio', url: './assets/W6-7 P1 Audio Overview.mp3' },
+        'w67b': { name: 'Week 6-7 (IRQ) Audio', url: './assets/W6-7 P2 Audio Overview.mp3' }
     },
     animFrame: null,
 };
@@ -225,11 +225,11 @@ function clearWaveform() {
 const pdfState = {
     currentWeek: null,
     files: {
-        'w1': { name: 'Week 1 Notes', url: './assets/W1 Notes.pdf' },
-        'w4': { name: 'Week 4 Notes', url: './assets/W4 Notes.pdf' },
-        'w56': { name: 'Week 5-6 Notes', url: './assets/W56 Notes.pdf' },
-        'w67a': { name: 'Week 6-7 (Mem) Notes', url: './assets/W67a Notes.pdf' },
-        'w67b': { name: 'Week 6-7 (IRQ) Notes', url: './assets/W67b Notes.pdf' }
+        'w1': { name: 'Week 1 Notes', url: './assets/Week 1 Study Notes.pdf' },
+        'w4': { name: 'Week 4 Notes', url: './assets/Week 4 Study Notes.pdf' },
+        'w56': { name: 'Week 5-6 Notes', url: './assets/Week 5 & 6 Study Notes.pdf' },
+        'w67a': { name: 'Week 6-7 (Mem) Notes', url: './assets/Week 6 & 7 Study Notes Part 1.pdf' },
+        'w67b': { name: 'Week 6-7 (IRQ) Notes', url: './assets/Week 6 & 7 Study Notes Part 2.pdf' }
     },
     zoom: 100,
 };
