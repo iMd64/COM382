@@ -1,10 +1,18 @@
-// ═══════ NAVIGATION ═══════
+// ═══════ NAVIGATION & GLOBAL STATE ═══════
 const weekMap = {
     w1: {view:'wk-w1', nav:'w1', firstSec:'w1-core'},
     w4: {view:'wk-w4', nav:'w4', firstSec:'w4-loops'},
     w56: {view:'wk-w56', nav:'w56', firstSec:'w56-hw'},
     w67a: {view:'wk-w67a', nav:'w67a', firstSec:'w67a-basics'},
     w67b: {view:'wk-w67b', nav:'w67b', firstSec:'w67b-mem'},
+};
+const weekLabels = {
+    w1: 'W1 — Core', w4: 'W4 — Loops', w56: 'W5–6 — Arch',
+    w67a: 'W6–7 — Mem', w67b: 'W6–7 — IRQ'
+};
+const weekColors = {
+    w1: '#4f8ef7', w4: '#34d399', w56: '#f59e0b',
+    w67a: '#f472b6', w67b: '#ef4444'
 };
 let currentWeek = 'w1';
 
@@ -13,13 +21,19 @@ function switchWeek(w) {
     document.querySelectorAll('.wtab').forEach(t => t.classList.toggle('active', t.dataset.week === w));
     document.querySelectorAll('.sb-week-nav').forEach(n => n.style.display = n.dataset.for === w ? '' : 'none');
     document.getElementById('wk-' + w).classList.add('active');
+    
     currentWeek = w;
     const firstSec = weekMap[w].firstSec;
+    
     document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
     const sec = document.getElementById(firstSec);
     if(sec) sec.classList.add('active');
+    
     document.querySelectorAll('.sb-btn').forEach(b => b.classList.toggle('active', b.dataset.sec === firstSec));
     document.querySelector('.main-content').scrollTop = 0;
+
+    // Trigger audio switch automatically
+    switchAudioWeek(w);
 }
 
 document.querySelectorAll('.wtab').forEach(t => t.addEventListener('click', () => switchWeek(t.dataset.week)));
@@ -33,6 +47,306 @@ document.querySelectorAll('.sb-btn').forEach(btn => {
         document.querySelector('.main-content').scrollTop = 0;
     });
 });
+
+// ═══════ AUDIO PLAYER LOGIC ═══════
+const audioState = {
+    audio: null,
+    playing: false,
+    currentWeek: null,
+    files: {
+        'w1': { name: 'Week 1 Audio', url: './assets/W1 Audio.mp3' },
+        'w4': { name: 'Week 4 Audio', url: './assets/W4 Audio.mp3' },
+        'w56': { name: 'Week 5-6 Audio', url: './assets/W56 Audio.mp3' },
+        'w67a': { name: 'Week 6-7 (Mem) Audio', url: './assets/W67a Audio.mp3' },
+        'w67b': { name: 'Week 6-7 (IRQ) Audio', url: './assets/W67b Audio.mp3' }
+    },
+    animFrame: null,
+};
+
+function switchAudioWeek(weekId) {
+    if (audioState.audio && audioState.playing) {
+        audioState.audio.pause();
+        audioState.playing = false;
+        document.getElementById('audio-play-btn').textContent = '▶';
+        if (audioState.animFrame) cancelAnimationFrame(audioState.animFrame);
+    }
+
+    audioState.currentWeek = weekId;
+    const color = weekColors[weekId] || '#4f8ef7';
+    document.getElementById('audio-week-label').textContent = weekLabels[weekId] || weekId;
+    document.getElementById('audio-week-label').style.color = color;
+    document.getElementById('audio-play-btn').style.background = color;
+
+    const fileData = audioState.files[weekId];
+    if (fileData) {
+        loadAudioURL(fileData.url, fileData.name, weekId);
+    } else {
+        document.getElementById('audio-track-name').textContent = 'No audio loaded';
+        document.getElementById('audio-progress').value = 0;
+        document.getElementById('audio-time').textContent = '0:00 / 0:00';
+        clearWaveform();
+        if (audioState.audio) {
+            audioState.audio.pause();
+            audioState.audio = null;
+        }
+    }
+    showAudioBar();
+}
+
+function showAudioBar() {
+    document.getElementById('audio-bar').classList.add('visible');
+    document.body.classList.add('audio-visible');
+}
+
+function hideAudioBar() {
+    if (audioState.audio) {
+        audioState.audio.pause();
+        audioState.playing = false;
+    }
+    document.getElementById('audio-bar').classList.remove('visible');
+    document.body.classList.remove('audio-visible');
+}
+
+function loadAudioURL(url, name, weekId) {
+    if (audioState.audio) {
+        audioState.audio.pause();
+        audioState.audio.src = '';
+    }
+    const audio = new Audio(url);
+    audio.volume = parseFloat(document.getElementById('audio-volume').value);
+    audioState.audio = audio;
+    audioState.playing = false;
+    document.getElementById('audio-play-btn').textContent = '▶';
+
+    const trackEl = document.getElementById('audio-track-name');
+    trackEl.textContent = name;
+
+    audio.addEventListener('loadedmetadata', () => {
+        document.getElementById('audio-progress').max = audio.duration;
+        document.getElementById('audio-time').textContent = `0:00 / ${fmtTime(audio.duration)}`;
+        drawStaticWaveform(weekColors[weekId] || '#4f8ef7');
+    });
+
+    audio.addEventListener('timeupdate', () => {
+        if (!audio.duration) return;
+        document.getElementById('audio-progress').value = audio.currentTime;
+        document.getElementById('audio-time').textContent = `${fmtTime(audio.currentTime)} / ${fmtTime(audio.duration)}`;
+    });
+
+    audio.addEventListener('ended', () => {
+        audioState.playing = false;
+        document.getElementById('audio-play-btn').textContent = '▶';
+        if (audioState.animFrame) cancelAnimationFrame(audioState.animFrame);
+        clearWaveform();
+    });
+}
+
+function togglePlay() {
+    if (!audioState.audio) return;
+    if (audioState.playing) {
+        audioState.audio.pause();
+        audioState.playing = false;
+        document.getElementById('audio-play-btn').textContent = '▶';
+        if (audioState.animFrame) cancelAnimationFrame(audioState.animFrame);
+        drawStaticWaveform(weekColors[audioState.currentWeek] || '#4f8ef7');
+    } else {
+        audioState.audio.play().catch(() => {});
+        audioState.playing = true;
+        document.getElementById('audio-play-btn').textContent = '⏸';
+        animateWaveform();
+    }
+}
+
+function seekAudio(val) {
+    if (audioState.audio) audioState.audio.currentTime = parseFloat(val);
+}
+
+function setVolume(val) {
+    if (audioState.audio) audioState.audio.volume = parseFloat(val);
+}
+
+function fmtTime(s) {
+    if (!isFinite(s)) return '0:00';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60).toString().padStart(2,'0');
+    return `${m}:${sec}`;
+}
+
+function animateWaveform() {
+    const canvas = document.getElementById('audio-waveform');
+    const ctx = canvas.getContext('2d');
+    const color = weekColors[audioState.currentWeek] || '#4f8ef7';
+    const W = canvas.width, H = canvas.height;
+    const bars = 20;
+    let t = 0;
+
+    function draw() {
+        ctx.clearRect(0,0,W,H);
+        const bw = W / bars - 1;
+        for (let i = 0; i < bars; i++) {
+            const h = (Math.sin(t * 3 + i * 0.7) * 0.4 + 0.6) * H * 0.8;
+            const y = (H - h) / 2;
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.75 + Math.sin(t + i) * 0.25;
+            ctx.fillRect(i * (bw + 1), y, bw, h);
+        }
+        ctx.globalAlpha = 1;
+        t += 0.07;
+        if (audioState.playing) {
+            audioState.animFrame = requestAnimationFrame(draw);
+        }
+    }
+    draw();
+}
+
+function drawStaticWaveform(color) {
+    const canvas = document.getElementById('audio-waveform');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const bars = 20;
+    const bw = W / bars - 1;
+    for (let i = 0; i < bars; i++) {
+        const h = (Math.sin(i * 0.9) * 0.3 + 0.5) * H * 0.65;
+        const y = (H - h) / 2;
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.3;
+        ctx.fillRect(i * (bw + 1), y, bw, h);
+    }
+    ctx.globalAlpha = 1;
+}
+
+function clearWaveform() {
+    const canvas = document.getElementById('audio-waveform');
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// ═══════ PDF DRAWER LOGIC ═══════
+const pdfState = {
+    currentWeek: null,
+    files: {
+        'w1': { name: 'Week 1 Notes', url: './assets/W1 Notes.pdf' },
+        'w4': { name: 'Week 4 Notes', url: './assets/W4 Notes.pdf' },
+        'w56': { name: 'Week 5-6 Notes', url: './assets/W56 Notes.pdf' },
+        'w67a': { name: 'Week 6-7 (Mem) Notes', url: './assets/W67a Notes.pdf' },
+        'w67b': { name: 'Week 6-7 (IRQ) Notes', url: './assets/W67b Notes.pdf' }
+    },
+    zoom: 100,
+};
+
+let isPdfMaximized = false;
+
+function openPDF(weekId) {
+    pdfState.currentWeek = weekId;
+    const color = weekColors[weekId] || '#4f8ef7';
+
+    const badge = document.getElementById('pdf-week-badge');
+    badge.textContent = weekLabels[weekId] || weekId;
+    badge.style.background = `${color}18`;
+    badge.style.color = color;
+    badge.style.borderColor = `${color}40`;
+
+    const fileData = pdfState.files[weekId];
+    if (fileData) {
+        showPDFViewer(fileData.url);
+    } else {
+        showPDFUpload();
+    }
+
+    document.getElementById('pdf-drawer').classList.add('open');
+    document.getElementById('pdf-overlay').classList.add('active');
+}
+
+function closePDF() {
+    document.getElementById('pdf-drawer').classList.remove('open');
+    document.getElementById('pdf-overlay').classList.remove('active');
+    if (isPdfMaximized) togglePDFSize(); 
+}
+
+function showPDFUpload() {
+    document.getElementById('pdf-upload-zone').style.display = 'flex';
+    document.getElementById('pdf-viewer-area').classList.remove('active');
+}
+
+function showPDFViewer(url) {
+    document.getElementById('pdf-upload-zone').style.display = 'none';
+    document.getElementById('pdf-viewer-area').classList.add('active');
+    const frame = document.getElementById('pdf-frame');
+    frame.src = url + '#toolbar=1&navpanes=0&scrollbar=1';
+    pdfFit();
+}
+
+function loadPDFFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const weekId = pdfState.currentWeek;
+    const url = URL.createObjectURL(file);
+    pdfState.files[weekId] = { name: file.name, url };
+    showPDFViewer(url);
+    input.value = '';
+}
+
+function pdfZoomIn() {
+    pdfState.zoom = Math.min(250, pdfState.zoom + 25);
+    applyZoom();
+}
+
+function pdfZoomOut() {
+    pdfState.zoom = Math.max(50, pdfState.zoom - 25);
+    applyZoom();
+}
+
+function pdfFit() {
+    pdfState.zoom = 100;
+    applyZoom();
+}
+
+function applyZoom() {
+    const frame = document.getElementById('pdf-frame');
+    if(pdfState.zoom === 100) {
+        frame.style.transform = '';
+        frame.style.width = '100%';
+        frame.style.height = '100%';
+    } else {
+        const scale = pdfState.zoom / 100;
+        frame.style.transform = `scale(${scale})`;
+        frame.style.width = `${100 / scale}%`;
+        frame.style.height = `${100 / scale}%`;
+    }
+    document.getElementById('pdf-page-info').textContent = `Zoom: ${pdfState.zoom}%`;
+}
+
+function setupDragDrop() {
+    const zone = document.getElementById('pdf-drop-area');
+    if (!zone) return;
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type === 'application/pdf') {
+            const url = URL.createObjectURL(file);
+            const weekId = pdfState.currentWeek;
+            pdfState.files[weekId] = { name: file.name, url };
+            showPDFViewer(url);
+        }
+    });
+}
+
+function togglePDFSize() {
+    const drawer = document.getElementById('pdf-drawer');
+    const btn = document.getElementById('pdf-size-btn');
+    
+    isPdfMaximized = !isPdfMaximized;
+    if (isPdfMaximized) {
+        drawer.classList.add('maximized');
+        btn.textContent = '🗕 Restore';
+    } else {
+        drawer.classList.remove('maximized');
+        btn.textContent = '⛶ Enlarge';
+    }
+}
 
 // ═══════ W1: EMBED TABS ═══════
 function showEmbed(id, btn) {
@@ -152,7 +466,7 @@ function calcJump() {
     const pc = parseInt(pcHex, 16);
     let rel = parseInt(relHex, 16);
     if(isNaN(pc) || isNaN(rel)) return;
-    if (rel > 127) rel = rel - 256; // 8-bit signed two's complement
+    if (rel > 127) rel = rel - 256; 
     let target = pc + rel;
     if (target < 0) target += 65536;
     if (target > 65535) target -= 65536;
@@ -181,32 +495,10 @@ function updateStackUI() {
     document.getElementById('btnPush').disabled = stack.length >= 5;
 }
 
-function stackCall() {
-    sp += 2;
-    stack.push('PC (Low)');
-    stack.push('PC (High)');
-    updateStackUI();
-}
-function stackRet() {
-    if(stack.length >= 2) {
-        sp -= 2;
-        stack.pop();
-        stack.pop();
-        updateStackUI();
-    }
-}
-function stackPush() {
-    sp += 1;
-    stack.push('R4 Data');
-    updateStackUI();
-}
-function stackPop() {
-    if(stack.length >= 1) {
-        sp -= 1;
-        stack.pop();
-        updateStackUI();
-    }
-}
+function stackCall() { sp += 2; stack.push('PC (Low)'); stack.push('PC (High)'); updateStackUI(); }
+function stackRet() { if(stack.length >= 2) { sp -= 2; stack.pop(); stack.pop(); updateStackUI(); } }
+function stackPush() { sp += 1; stack.push('R4 Data'); updateStackUI(); }
+function stackPop() { if(stack.length >= 1) { sp -= 1; stack.pop(); updateStackUI(); } }
 
 // ═══════ W4: TIMING ═══════
 function calcDelay() {
@@ -226,8 +518,7 @@ function calcNested() {
     document.getElementById('nlCodeR2').textContent = outer;
     document.getElementById('nlCodeR3').textContent = inner;
     if(f > 0) {
-        const mcTime = (12 / f); // in us
-        // Approx: outer * (inner * 4 + 2)
+        const mcTime = (12 / f); 
         const totalMcs = outer * (inner * 4 + 2);
         const totalUs = totalMcs * mcTime;
         document.getElementById('nlTotal').textContent = (totalUs / 1000).toFixed(2) + ' ms';
@@ -236,7 +527,7 @@ function calcNested() {
 
 // ═══════ W4: OVEN I/O ═══════
 function updateOven() {
-    const safe = document.getElementById('ovenToggle').checked; // Checked = HIGH (safe), Unchecked = LOW (alarm)
+    const safe = document.getElementById('ovenToggle').checked; 
     if(safe) {
         document.getElementById('ovenStatusTxt').textContent = 'SAFE';
         document.getElementById('ovenStatusTxt').style.color = 'var(--accent2)';
@@ -329,7 +620,7 @@ function calcTimerFreq() {
     }
 }
 
-let simCount = 253; // Start near overflow (FD)
+let simCount = 253; 
 function simStep() {
     const reload = parseInt(document.getElementById('simTH1').value, 16) || 0;
     simCount++;
@@ -583,16 +874,16 @@ function calcT2() {
 // ═══════ W67B: TMOD ═══════
 let tmodState = { gate:0, ct:0, m1:0, m0:0 };
 function toggleTMOD(bit) {
-    tmodState[bit] = tmodState[bit] ? 0 : 1;
-    const btn = document.getElementById('tmod_' + bit);
-    btn.classList.toggle('on', tmodState[bit]);
-    btn.innerHTML = `${tmodState[bit]}<span class="bit-label">${bit.toUpperCase()}</span>`;
-    
+    if(bit !== 'fake') tmodState[bit] = tmodState[bit] ? 0 : 1;
+    if(bit !== 'fake') {
+        const btn = document.getElementById('tmod_' + bit);
+        btn.classList.toggle('on', tmodState[bit]);
+        btn.innerHTML = `${tmodState[bit]}<span class="bit-label">${bit.toUpperCase()}</span>`;
+    }
     let mode = (tmodState.m1 << 1) | tmodState.m0;
     let modeTxt = ['0 (13-bit)', '1 (16-bit)', '2 (8-bit Auto-Reload)', '3 (Split)'][mode];
     let src = tmodState.ct ? 'Counter (External pin T0)' : 'Timer (Internal clock)';
     let ctrl = tmodState.gate ? 'Requires TR0=1 AND INT0 pin HIGH' : 'Requires TR0=1 only';
-    
     document.getElementById('tmodResult').innerHTML = `<strong>Mode:</strong> ${modeTxt}<br><strong>Source:</strong> ${src}<br><strong>Control:</strong> ${ctrl}`;
 }
 
@@ -630,11 +921,12 @@ function stepAlarm() {
     else if(alStep === 4) btn.textContent = 'Reset Scenario';
 }
 
-// Initialize on load
+// ═══════ INITIALIZATION ═══════
 window.onload = () => {
     initPins();
     renderIntRAM();
     updateDecoder();
-    toggleTMOD('fake'); // to init display
     toggleTMOD('fake'); 
+    setupDragDrop();
+    switchAudioWeek(currentWeek);
 };

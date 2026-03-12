@@ -13,6 +13,65 @@
 </head>
 <body>
 
+<!-- AUDIO PLAYER BAR -->
+<div id="audio-bar">
+    <div class="audio-info">
+        <div id="audio-week-label">W1 — Intro</div>
+        <div id="audio-track-name">No file loaded</div>
+    </div>
+    <button id="audio-play-btn" onclick="togglePlay()" title="Play/Pause">▶</button>
+    <div class="audio-progress-wrap">
+        <input type="range" id="audio-progress" min="0" max="100" value="0" step="0.1" oninput="seekAudio(this.value)">
+    </div>
+    <span id="audio-time">0:00 / 0:00</span>
+    <canvas id="audio-waveform" width="80" height="32"></canvas>
+    <span style="font-size:1rem;opacity:0.5;flex-shrink:0">🔊</span>
+    <input type="range" id="audio-volume" min="0" max="1" step="0.05" value="1" oninput="setVolume(this.value)" title="Volume">
+</div>
+
+<!-- PDF DRAWER OVERLAY -->
+<div id="pdf-overlay" onclick="closePDF()"></div>
+
+<!-- PDF DRAWER -->
+<div id="pdf-drawer">
+    <div id="pdf-drawer-header">
+        <div>
+            <div id="pdf-week-badge">Week 1</div>
+            <div id="pdf-drawer-title">Study Notes</div>
+        </div>
+        <button id="pdf-close-btn" onclick="closePDF()" title="Close">✕</button>
+    </div>
+    
+    <input type="file" id="pdf-file-input" accept="application/pdf" style="display:none" onchange="loadPDFFile(this)">
+    
+    <!-- Upload state -->
+    <div id="pdf-upload-zone">
+        <div class="pdf-drop-area" id="pdf-drop-area" onclick="document.getElementById('pdf-file-input').click()">
+            <div class="pdf-drop-icon">📄</div>
+            <div class="pdf-drop-text">
+                <strong>Click to load a PDF</strong><br>
+                Drop your study notes PDF here for this week.<br>
+                <span style="font-size:0.78rem;opacity:0.6">Supports standard PDF files</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Viewer state -->
+    <div id="pdf-viewer-area">
+        <div id="pdf-toolbar">
+            <span id="pdf-page-info">Loaded</span>
+            <button class="pdf-tool-btn" id="pdf-size-btn" onclick="togglePDFSize()">⛶ Enlarge</button>
+            <button class="pdf-tool-btn" style="margin-left:auto" onclick="pdfZoomOut()">− Zoom</button>
+            <button class="pdf-tool-btn" onclick="pdfZoomIn()">+ Zoom</button>
+            <button class="pdf-tool-btn" onclick="pdfFit()">Fit</button>
+            <button class="pdf-tool-btn" onclick="document.getElementById('pdf-file-input').click()">⬆ Replace</button>
+        </div>
+        <div id="pdf-frame-container">
+            <iframe id="pdf-frame" title="PDF Viewer"></iframe>
+        </div>
+    </div>
+</div>
+
 <!-- TOP BAR -->
 <div class="top-bar">
     <div class="logo">MICRO<span>SYS</span></div>
@@ -33,6 +92,7 @@
     <!-- W1 sidebar -->
     <div class="sb-week-nav" data-for="w1">
         <div class="sb-section-label">Week 1</div>
+        <button class="sidebar-pdf-btn" onclick="openPDF('w1')">📄 Week 1 Notes</button>
         <button class="sb-btn active" data-sec="w1-core"><span class="sb-icon">⚡</span>Core Definitions</button>
         <button class="sb-btn" data-sec="w1-arch"><span class="sb-icon">🏛</span>Architectures</button>
         <button class="sb-btn" data-sec="w1-8051"><span class="sb-icon">🔲</span>The 8051 Family</button>
@@ -45,6 +105,7 @@
     <!-- W4 sidebar -->
     <div class="sb-week-nav" data-for="w4" style="display:none">
         <div class="sb-section-label">Week 4</div>
+        <button class="sidebar-pdf-btn" style="color:var(--accent2);border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.05)" onclick="openPDF('w4')">📄 Week 4 Notes</button>
         <button class="sb-btn active" data-sec="w4-loops"><span class="sb-icon">🔁</span>Loops & DJNZ</button>
         <button class="sb-btn" data-sec="w4-jumps"><span class="sb-icon">↗️</span>Jump Mechanics</button>
         <button class="sb-btn" data-sec="w4-stack"><span class="sb-icon">📚</span>Stack & Subroutines</button>
@@ -56,6 +117,7 @@
     <!-- W56 sidebar -->
     <div class="sb-week-nav" data-for="w56" style="display:none">
         <div class="sb-section-label">Week 5–6</div>
+        <button class="sidebar-pdf-btn" style="color:var(--accent3);border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.05)" onclick="openPDF('w56')">📄 Week 5-6 Notes</button>
         <button class="sb-btn active" data-sec="w56-hw"><span class="sb-icon">🖥</span>Hardware Overview</button>
         <button class="sb-btn" data-sec="w56-mem"><span class="sb-icon">💾</span>Memory Map</button>
         <button class="sb-btn" data-sec="w56-sfr"><span class="sb-icon">⚙️</span>SFRs & PSW</button>
@@ -68,6 +130,7 @@
     <!-- W67A sidebar -->
     <div class="sb-week-nav" data-for="w67a" style="display:none">
         <div class="sb-section-label">Week 6–7 (Memory)</div>
+        <button class="sidebar-pdf-btn" style="color:var(--accent4);border-color:rgba(244,114,182,0.3);background:rgba(244,114,182,0.05)" onclick="openPDF('w67a')">📄 W6-7 Mem Notes</button>
         <button class="sb-btn active" data-sec="w67a-basics"><span class="sb-icon">🧮</span>Memory Capacity</button>
         <button class="sb-btn" data-sec="w67a-types"><span class="sb-icon">💿</span>Memory Types <span class="new-tag">NEW</span></button>
         <button class="sb-btn" data-sec="w67a-decode"><span class="sb-icon">🔀</span>Address Decoding</button>
@@ -79,6 +142,7 @@
     <!-- W67B sidebar -->
     <div class="sb-week-nav" data-for="w67b" style="display:none">
         <div class="sb-section-label">Week 6–7 (IRQ)</div>
+        <button class="sidebar-pdf-btn" style="color:#ef4444;border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.05)" onclick="openPDF('w67b')">📄 W6-7 IRQ Notes</button>
         <button class="sb-btn active" data-sec="w67b-mem"><span class="sb-icon">💾</span>Memory & SFRs</button>
         <button class="sb-btn" data-sec="w67b-timing"><span class="sb-icon">⏱</span>Core Timing</button>
         <button class="sb-btn" data-sec="w67b-tmod"><span class="sb-icon">⚙️</span>Timer Config</button>
@@ -93,7 +157,7 @@
 <main class="main-content" id="mainContent">
 
 <!-- ╔══════════════════════════════════╗ -->
-<!-- ║           WEEK 1                ║ -->
+<!-- ║           WEEK 1                 ║ -->
 <!-- ╚══════════════════════════════════╝ -->
 <div class="week-view active" id="wk-w1">
 
