@@ -1,54 +1,143 @@
-// ═══════ NAVIGATION & GLOBAL STATE ═══════
-const weekMap = {
-    w1: {view:'wk-w1', nav:'w1', firstSec:'w1-core'},
-    w4: {view:'wk-w4', nav:'w4', firstSec:'w4-loops'},
-    w56: {view:'wk-w56', nav:'w56', firstSec:'w56-hw'},
-    w67a: {view:'wk-w67a', nav:'w67a', firstSec:'w67a-basics'},
-    w67b: {view:'wk-w67b', nav:'w67b', firstSec:'w67b-mem'},
+// ============================================================
+// NAVIGATION & SIDEBAR SYSTEM (Adapted for Microprocessors)
+// ============================================================
+
+const weekSections = {
+    w1: [
+        { id: 'core', label: '⚡ Core Definitions' },
+        { id: 'arch', label: '🏛 Architectures' },
+        { id: '8051', label: '🔲 The 8051 Family' },
+        { id: 'ops', label: '🔄 CPU Operations' },
+        { id: 'select', label: '📋 Selection Criteria' },
+        { id: 'pinout', label: '📌 Pinout Explorer' },
+        { id: 'buses', label: '🚌 Bus Architecture ✦' }
+    ],
+    w4: [
+        { id: 'loops', label: '🔁 Loops & DJNZ' },
+        { id: 'jumps', label: '↗️ Jump Mechanics' },
+        { id: 'stack', label: '📚 Stack & Subroutines' },
+        { id: 'timing', label: '⏱ Timing & Delays' },
+        { id: 'io', label: '🔌 I/O & Bit Logic' },
+        { id: '16bit', label: '🔢 16-bit Arithmetic ✦' }
+    ],
+    w56: [
+        { id: 'hw', label: '🖥 Hardware Overview' },
+        { id: 'mem', label: '💾 Memory Map' },
+        { id: 'sfr', label: '⚙️ SFRs & PSW' },
+        { id: 'timers', label: '⏰ Timers' },
+        { id: 'irq', label: '⚠️ Interrupts' },
+        { id: 'clab', label: '💻 C Lab' },
+        { id: 'freq', label: '📡 Square Waves ✦' }
+    ],
+    w67a: [
+        { id: 'basics', label: '🧮 Memory Capacity' },
+        { id: 'types', label: '💿 Memory Types ✦' },
+        { id: 'decode', label: '🔀 Address Decoding' },
+        { id: 'ale', label: '🔌 ALE Multiplexing' },
+        { id: 'ea', label: '📍 EA Pin & Maps' },
+        { id: 'movx', label: '📦 MOVX Assembly' }
+    ],
+    w67b: [
+        { id: 'mem', label: '💾 Memory & SFRs' },
+        { id: 'timing', label: '⏱ Core Timing' },
+        { id: 'tmod', label: '⚙️ Timer Config' },
+        { id: 'irq', label: '⚠️ Interrupts' },
+        { id: 'scenario', label: '🚨 Alarm Scenario' },
+        { id: 'itypes', label: '🔀 IT0/IT1 Trigger ✦' }
+    ]
 };
-const weekLabels = {
-    w1: 'W1 — Core', w4: 'W4 — Loops', w56: 'W5–6 — Arch',
-    w67a: 'W6–7 — Mem', w67b: 'W6–7 — IRQ'
-};
+
 const weekColors = {
     w1: '#4f8ef7', w4: '#34d399', w56: '#f59e0b',
     w67a: '#f472b6', w67b: '#ef4444'
 };
+
+const weekLabels = {
+    w1: 'W1 — Core', w4: 'W4 — Loops', w56: 'W5–6 — Arch',
+    w67a: 'W6–7 — Mem', w67b: 'W6–7 — IRQ'
+};
+
 let currentWeek = 'w1';
+let currentSection = null;
 
-function switchWeek(w) {
-    document.querySelectorAll('.week-view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.wtab').forEach(t => t.classList.toggle('active', t.dataset.week === w));
-    document.querySelectorAll('.sb-week-nav').forEach(n => n.style.display = n.dataset.for === w ? '' : 'none');
-    document.getElementById('wk-' + w).classList.add('active');
+function buildSidebar(weekId) {
+    const sidebar = document.getElementById('sidebar');
+    const sections = weekSections[weekId];
+    if (!sections) { sidebar.innerHTML = ''; return; }
     
-    currentWeek = w;
-    const firstSec = weekMap[w].firstSec;
-    
-    document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
-    const sec = document.getElementById(firstSec);
-    if(sec) sec.classList.add('active');
-    
-    document.querySelectorAll('.sb-btn').forEach(b => b.classList.toggle('active', b.dataset.sec === firstSec));
-    document.querySelector('.main-content').scrollTop = 0;
+    const color = weekColors[weekId] || '#4f8ef7';
 
-    // Trigger audio switch automatically
-    switchAudioWeek(w);
+    // Resources panel at top of sidebar
+    let html = `
+        <div class="sb-section-label" style="color:${color}">Resources</div>
+        <button class="sidebar-pdf-btn" style="border-color:${color}40;color:${color}" onclick="openPDF('${weekId}')">
+            📄 Week Notes PDF
+        </button>
+        <div class="sb-section-label" style="margin-top:0.75rem">Sections</div>
+    `;
+    
+    // Generate sections dynamically
+    sections.forEach(s => {
+        const id = `${weekId}-${s.id}`;
+        const isNew = s.label.includes('✦');
+        const cleanLabel = s.label.replace(' ✦', '');
+        const newTag = isNew ? `<span class="new-tag">NEW</span>` : '';
+        html += `<button class="sb-btn" id="nav-${id}" onclick="showSection('${weekId}','${s.id}')">${cleanLabel} ${newTag}</button>`;
+    });
+    
+    sidebar.innerHTML = html;
 }
 
-document.querySelectorAll('.wtab').forEach(t => t.addEventListener('click', () => switchWeek(t.dataset.week)));
+function showWeek(weekId) {
+    // Update top nav active state
+    document.querySelectorAll('.wtab').forEach(t => t.classList.remove('active'));
+    const activeTab = document.querySelector(`[data-week="${weekId}"]`);
+    if(activeTab) activeTab.classList.add('active');
 
-document.querySelectorAll('.sb-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const sec = btn.dataset.sec;
-        document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
-        document.getElementById(sec).classList.add('active');
-        document.querySelectorAll('.sb-btn').forEach(b => b.classList.toggle('active', b.dataset.sec === sec));
-        document.querySelector('.main-content').scrollTop = 0;
-    });
-});
+    // Show correct week page
+    document.querySelectorAll('.week-view').forEach(p => p.classList.remove('active'));
+    const weekPage = document.getElementById(`wk-${weekId}`);
+    if(weekPage) weekPage.classList.add('active');
 
-// ═══════ AUDIO PLAYER LOGIC ═══════
+    currentWeek = weekId;
+    
+    // Render dynamic sidebar
+    buildSidebar(weekId);
+
+    // Show first section automatically
+    const sections = weekSections[weekId];
+    if (sections && sections.length > 0) {
+        showSection(weekId, sections[0].id);
+    }
+
+    // Update audio bar for this week
+    switchAudioWeek(weekId);
+}
+
+function showSection(weekId, sectionId) {
+    // Hide all sections in this week
+    const allSections = document.querySelectorAll(`#wk-${weekId} .section-view`);
+    allSections.forEach(s => s.classList.remove('active'));
+
+    // Show target section
+    const target = document.getElementById(`${weekId}-${sectionId}`);
+    if (target) {
+        target.classList.add('active');
+        document.getElementById('mainContent').scrollTop = 0;
+    }
+
+    // Update sidebar button active state
+    document.querySelectorAll('.sb-btn').forEach(i => i.classList.remove('active'));
+    const navItem = document.getElementById(`nav-${weekId}-${sectionId}`);
+    if (navItem) navItem.classList.add('active');
+
+    currentSection = sectionId;
+}
+
+// ============================================================
+// AUDIO SYSTEM
+// ============================================================
+
 const audioState = {
     audio: null,
     playing: false,
@@ -221,7 +310,10 @@ function clearWaveform() {
     canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
 }
 
-// ═══════ PDF DRAWER LOGIC ═══════
+// ============================================================
+// PDF SYSTEM
+// ============================================================
+
 const pdfState = {
     currentWeek: null,
     files: {
@@ -348,7 +440,11 @@ function togglePDFSize() {
     }
 }
 
-// ═══════ W1: EMBED TABS ═══════
+// ============================================================
+// MICROPROCESSOR SIMULATOR FUNCTIONS
+// ============================================================
+
+// W1: EMBED TABS
 function showEmbed(id, btn) {
     document.querySelectorAll('[id^="embed-"]').forEach(e => e.style.display = 'none');
     document.getElementById('embed-' + id).style.display = 'grid';
@@ -356,7 +452,7 @@ function showEmbed(id, btn) {
     btn.className = 'btn-primary';
 }
 
-// ═══════ W1: ROM TECH ═══════
+// W1: ROM TECH
 const romData = {
     mask: {title:'80xx — Mask ROM (Factory Programmed)', desc:'Programmed permanently via photolithographic masks. Cannot be erased. Used in final, high-volume production.', badges:['badge-green:✓ Cheapest in volume','badge-red:✗ Permanent — no field updates']},
     uveprom: {title:'87xx — UV-EPROM', desc:'Erase: 15–20 min of UV light through a physical quartz window. Program via 12.5V on V_pp. Part prefix: 27xxx. Cannot be programmed on system board.', badges:['badge-amber:~1,000 cycles','badge-red:✗ Slow erase off-board']},
@@ -370,7 +466,7 @@ function showRom(key, btn) {
     btn.className = 'btn-primary';
 }
 
-// ═══════ W1: ARCHITECTURE ═══════
+// W1: ARCHITECTURE
 function showArch(type) {
     const h = type === 'harvard';
     document.getElementById('archTitle').textContent = h ? 'Harvard Architecture' : 'Princeton (Von-Neumann) Architecture';
@@ -394,7 +490,7 @@ function showArch(type) {
     }
 }
 
-// ═══════ W1: OPCODE FETCH ═══════
+// W1: OPCODE FETCH
 let fetchStep = 0;
 function stepFetch() {
     fetchStep = fetchStep >= 4 ? 1 : fetchStep + 1;
@@ -416,13 +512,13 @@ function stepFetch() {
     if(fetchStep===4) { hl('fDBus','g'); hl('fIR','a'); fetchStep=0; }
 }
 
-// ═══════ W1: MACHINE CYCLE CALC ═══════
+// W1: MACHINE CYCLE CALC
 function calcMC() {
     const f = parseFloat(document.getElementById('mcFreq').value);
     if(f>0){ document.getElementById('mcTosc').textContent = (1/f).toFixed(3)+' µs'; document.getElementById('mcTime').textContent = (12/f).toFixed(3)+' µs'; }
 }
 
-// ═══════ W1: PINOUT ═══════
+// W1: PINOUT
 const pinData = {
     1:{n:'P1.0',a:'',d:'Port 1, Bit 0. General-purpose I/O.'},2:{n:'P1.1',a:'',d:'Port 1, Bit 1. General-purpose I/O.'},3:{n:'P1.2',a:'',d:'Port 1, Bit 2.'},4:{n:'P1.3',a:'',d:'Port 1, Bit 3.'},5:{n:'P1.4',a:'',d:'Port 1, Bit 4.'},6:{n:'P1.5',a:'',d:'Port 1, Bit 5.'},7:{n:'P1.6',a:'',d:'Port 1, Bit 6.'},8:{n:'P1.7',a:'',d:'Port 1, Bit 7.'},
     9:{n:'RST',a:'',d:'Reset. High for 2 machine cycles resets the MCU.'},
@@ -436,6 +532,7 @@ const pinData = {
 function initPins() {
     const left = document.getElementById('pinsLeft');
     const right = document.getElementById('pinsRight');
+    if (!left || !right) return;
     for(let i=1; i<=20; i++) {
         left.innerHTML += `<div class="pin-row" onmouseenter="hoverPin(${i}, this)"><div class="pin-text">${i} ${pinData[i].n}</div><div class="pin-contact"></div></div>`;
     }
@@ -459,7 +556,7 @@ function hoverPin(num, el) {
     document.getElementById('pinDesc').textContent = data.d;
 }
 
-// ═══════ W4: SHORT JUMPS ═══════
+// W4: SHORT JUMPS
 function calcJump() {
     const pcHex = document.getElementById('jmpPC').value;
     const relHex = document.getElementById('jmpRel').value;
@@ -473,7 +570,7 @@ function calcJump() {
     document.getElementById('jmpResult').textContent = '0x' + target.toString(16).toUpperCase().padStart(4, '0');
 }
 
-// ═══════ W4: STACK SIMULATOR ═══════
+// W4: STACK SIMULATOR
 let stack = [];
 let sp = 7;
 function updateStackUI() {
@@ -500,7 +597,7 @@ function stackRet() { if(stack.length >= 2) { sp -= 2; stack.pop(); stack.pop();
 function stackPush() { sp += 1; stack.push('R4 Data'); updateStackUI(); }
 function stackPop() { if(stack.length >= 1) { sp -= 1; stack.pop(); updateStackUI(); } }
 
-// ═══════ W4: TIMING ═══════
+// W4: TIMING
 function calcDelay() {
     const f = parseFloat(document.getElementById('delayFreq').value);
     const mcs = parseInt(document.getElementById('delayMC').value);
@@ -525,7 +622,7 @@ function calcNested() {
     }
 }
 
-// ═══════ W4: OVEN I/O ═══════
+// W4: OVEN I/O
 function updateOven() {
     const safe = document.getElementById('ovenToggle').checked; 
     if(safe) {
@@ -555,7 +652,7 @@ function updateOven() {
     }
 }
 
-// ═══════ W56: EA PIN ═══════
+// W56: EA PIN
 function showEA(state) {
     const high = state === 'high';
     document.getElementById('eaHigh').className = high ? 'toggle-btn active' : 'toggle-btn';
@@ -565,7 +662,7 @@ function showEA(state) {
         : 'When <strong style="color:#fff">EA = 0 (Low)</strong>: 8051 forces ALL code fetches from external ROM (0000H–FFFFH). Internal ROM is ignored.';
 }
 
-// ═══════ W56: MEMORY MAP & SFR ═══════
+// W56: MEMORY MAP & SFR
 const memData = {
     sfr: { title: 'SFR Space (80H–FFH)', desc: 'Special Function Registers. Direct addressing only. Contains ACC, B, PSW, TMOD, etc.'},
     scratch: { title: 'Scratch Pad RAM (30H–7FH)', desc: 'General purpose data storage. Typically used for stack and user variables.'},
@@ -611,7 +708,7 @@ function togglePSW2(bit) {
     document.getElementById('psw2Status').innerHTML = `Active: <strong>Bank ${bankNum}</strong> (${ranges[bankNum]})`;
 }
 
-// ═══════ W56: TIMERS ═══════
+// W56: TIMERS
 function calcTimerFreq() {
     const f = parseFloat(document.getElementById('timerFreq').value);
     if(f > 0) {
@@ -643,7 +740,7 @@ function simReset() {
     document.getElementById('simTF1').classList.remove('tf-active');
 }
 
-// ═══════ W56: C LAB ═══════
+// W56: C LAB
 function updateLab() {
     const sw = document.getElementById('labSwitch').checked;
     document.getElementById('labSwVal').textContent = sw ? '1' : '0';
@@ -667,7 +764,7 @@ function updateLab() {
     }
 }
 
-// ═══════ W67A: MEMORY ═══════
+// W67A: MEMORY
 function calcMem() {
     const a = parseInt(document.getElementById('memAddr').value);
     const d = parseInt(document.getElementById('memData').value);
@@ -688,9 +785,11 @@ function calcMem() {
     }
 }
 
-// ═══════ W67A: DECODER ═══════
+// W67A: DECODER
 function updateDecoder() {
-    const a = document.getElementById('decA').checked ? 1 : 0;
+    const decA = document.getElementById('decA');
+    if (!decA) return; // Prevent break if element is missing
+    const a = decA.checked ? 1 : 0;
     const b = document.getElementById('decB').checked ? 1 : 0;
     const c = document.getElementById('decC').checked ? 1 : 0;
     const val = (c << 2) | (b << 1) | a;
@@ -709,7 +808,7 @@ function updateDecoder() {
     document.getElementById('decRange').innerHTML = `<strong>Selected:</strong> ${start}–${end} (4 KB block)`;
 }
 
-// ═══════ W67A: ALE ═══════
+// W67A: ALE
 let aleStep = 0;
 function stepALE() {
     aleStep++;
@@ -762,7 +861,7 @@ function stepALE() {
     }
 }
 
-// ═══════ W67A: EA MAPS ═══════
+// W67A: EA MAPS
 function updateEAMap() {
     const mcu = document.getElementById('eaMCU').value;
     const ea = document.getElementById('eaPIN').value;
@@ -791,7 +890,7 @@ function updateEAMap() {
     }
 }
 
-// ═══════ W67A: MOVX STEPPER ═══════
+// W67A: MOVX STEPPER
 let mxStep = -1;
 let mxR5 = 10;
 let mxDPTR = 0;
@@ -834,7 +933,7 @@ function stepMOVX() {
         mxR5--; 
         document.getElementById('movxR5').textContent = mxR5.toString(16).toUpperCase().padStart(2, '0') + 'H';
         if(mxR5 > 0) {
-            mxStep = 2; // Will jump to 3 on next click
+            mxStep = 2; 
             document.getElementById('movxLog').textContent = `R5 != 0. Looping back.`;
         } else {
             document.getElementById('movxLog').textContent = `R5 = 0. Copy complete!`;
@@ -845,7 +944,10 @@ function stepMOVX() {
         mxStep = -1;
         mxR5 = 10; mxDPTR = 0; mxR0 = 48; mxA = 0;
         intMem.fill('00');
-        ['DPTR','R5','R0','A'].forEach(id => document.getElementById('movx'+id).textContent = '—');
+        ['DPTR','R5','R0','A'].forEach(id => {
+            const el = document.getElementById('movx'+id);
+            if(el) el.textContent = '—';
+        });
         renderIntRAM();
         document.getElementById('movxBtn').textContent = 'Step Execute';
         document.getElementById('movxLog').textContent = 'Ready.';
@@ -862,7 +964,7 @@ function renderIntRAM() {
     if (target) target.innerHTML = h;
 }
 
-// ═══════ W67B: TIMING ═══════
+// W67B: TIMING
 function calcT2() {
     const f = parseFloat(document.getElementById('t2Freq').value);
     if(f > 0) {
@@ -875,7 +977,7 @@ function calcT2() {
     }
 }
 
-// ═══════ W67B: TMOD ═══════
+// W67B: TMOD
 let tmodState = { gate:0, ct:0, m1:0, m0:0 };
 function toggleTMOD(bit) {
     if(bit !== 'fake') tmodState[bit] = tmodState[bit] ? 0 : 1;
@@ -895,9 +997,12 @@ function toggleTMOD(bit) {
     if (res) res.innerHTML = `<strong>Mode:</strong> ${modeTxt}<br><strong>Source:</strong> ${src}<br><strong>Control:</strong> ${ctrl}`;
 }
 
-// ═══════ W67B: IE REG ═══════
+// W67B: IE REG
 function updateIE() {
-    const ea = document.getElementById('ieEA').checked;
+    const eaBtn = document.getElementById('ieEA');
+    if (!eaBtn) return;
+    const ea = eaBtn.checked;
+    
     document.getElementById('ieSubSwitches').style.opacity = ea ? '1' : '0.4';
     document.getElementById('ieSubSwitches').style.pointerEvents = ea ? 'auto' : 'none';
     
@@ -911,7 +1016,7 @@ function updateIE() {
     document.getElementById('ieHex').textContent = '0x' + val.toString(16).toUpperCase().padStart(2, '0');
 }
 
-// ═══════ W67B: ALARM SCENARIO ═══════
+// W67B: ALARM SCENARIO
 let alStep = 0;
 function stepAlarm() {
     alStep++;
@@ -929,17 +1034,25 @@ function stepAlarm() {
     else if(alStep === 4) btn.textContent = 'Reset Scenario';
 }
 
-// ═══════ INITIALIZATION ═══════
-window.onload = () => {
-    // 1. Initialize original simulators securely
+// ============================================================
+// BOOT SEQUENCE
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Attach listener to top nav tabs (mapped to .wtab correctly now)
+    document.querySelectorAll('.wtab').forEach(t => {
+        t.addEventListener('click', () => showWeek(t.dataset.week));
+    });
+
+    // 2. Safely initialize simulators
     if (typeof initPins === 'function') initPins();
     if (typeof renderIntRAM === 'function') renderIntRAM();
     if (typeof updateDecoder === 'function') updateDecoder();
-    if (typeof toggleTMOD === 'function') {
-        toggleTMOD('fake'); 
-    }
+    if (typeof toggleTMOD === 'function') toggleTMOD('fake'); 
     
-    // 2. Initialize newly ported features safely
+    // 3. Initialize UI Features
     if (typeof setupDragDrop === 'function') setupDragDrop();
-    if (typeof switchAudioWeek === 'function') switchAudioWeek(currentWeek);
-};
+    
+    // 4. Force load week 1 content and sidebar setup
+    showWeek('w1');
+});
