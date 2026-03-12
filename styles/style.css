@@ -260,13 +260,12 @@
         .hw-switch input:checked + .hw-slider { background: var(--accent2); }
         .hw-switch input:checked + .hw-slider:before { transform: translateX(20px); }
 
-
         /* ── AUDIO PLAYER BAR ── */
         #audio-bar {
             position: fixed;
             bottom: 0; left: 0; right: 0;
             height: 64px;
-            background: rgba(17,19,24,0.97); /* slightly matches surface */
+            background: rgba(17,19,24,0.97);
             backdrop-filter: blur(20px);
             border-top: 1px solid var(--border);
             display: flex;

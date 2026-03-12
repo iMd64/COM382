@@ -803,8 +803,11 @@ let intMem = new Array(10).fill('00');
 function stepMOVX() {
     const hl = (n) => {
         for(let i=0; i<=7; i++) {
-            document.getElementById('mc'+i).style.borderLeftColor = (i===n) ? 'var(--accent)' : 'transparent';
-            document.getElementById('mc'+i).style.color = (i===n) ? 'var(--text)' : '#6e7681';
+            const el = document.getElementById('mc'+i);
+            if(el) {
+                el.style.borderLeftColor = (i===n) ? 'var(--accent)' : 'transparent';
+                el.style.color = (i===n) ? 'var(--text)' : '#6e7681';
+            }
         }
     };
     
@@ -855,7 +858,8 @@ function renderIntRAM() {
     for(let i=0; i<10; i++) {
         h += `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px"><div style="color:var(--muted);font-size:0.6rem">3${i}H</div><div style="color:var(--accent2)">${intMem[i]}</div></div>`;
     }
-    document.getElementById('movxRAM').innerHTML = h;
+    const target = document.getElementById('movxRAM');
+    if (target) target.innerHTML = h;
 }
 
 // ═══════ W67B: TIMING ═══════
@@ -877,14 +881,18 @@ function toggleTMOD(bit) {
     if(bit !== 'fake') tmodState[bit] = tmodState[bit] ? 0 : 1;
     if(bit !== 'fake') {
         const btn = document.getElementById('tmod_' + bit);
-        btn.classList.toggle('on', tmodState[bit]);
-        btn.innerHTML = `${tmodState[bit]}<span class="bit-label">${bit.toUpperCase()}</span>`;
+        if (btn) {
+            btn.classList.toggle('on', tmodState[bit]);
+            btn.innerHTML = `${tmodState[bit]}<span class="bit-label">${bit.toUpperCase()}</span>`;
+        }
     }
     let mode = (tmodState.m1 << 1) | tmodState.m0;
     let modeTxt = ['0 (13-bit)', '1 (16-bit)', '2 (8-bit Auto-Reload)', '3 (Split)'][mode];
     let src = tmodState.ct ? 'Counter (External pin T0)' : 'Timer (Internal clock)';
     let ctrl = tmodState.gate ? 'Requires TR0=1 AND INT0 pin HIGH' : 'Requires TR0=1 only';
-    document.getElementById('tmodResult').innerHTML = `<strong>Mode:</strong> ${modeTxt}<br><strong>Source:</strong> ${src}<br><strong>Control:</strong> ${ctrl}`;
+    
+    const res = document.getElementById('tmodResult');
+    if (res) res.innerHTML = `<strong>Mode:</strong> ${modeTxt}<br><strong>Source:</strong> ${src}<br><strong>Control:</strong> ${ctrl}`;
 }
 
 // ═══════ W67B: IE REG ═══════
@@ -923,10 +931,15 @@ function stepAlarm() {
 
 // ═══════ INITIALIZATION ═══════
 window.onload = () => {
-    initPins();
-    renderIntRAM();
-    updateDecoder();
-    toggleTMOD('fake'); 
-    setupDragDrop();
-    switchAudioWeek(currentWeek);
+    // 1. Initialize original simulators securely
+    if (typeof initPins === 'function') initPins();
+    if (typeof renderIntRAM === 'function') renderIntRAM();
+    if (typeof updateDecoder === 'function') updateDecoder();
+    if (typeof toggleTMOD === 'function') {
+        toggleTMOD('fake'); 
+    }
+    
+    // 2. Initialize newly ported features safely
+    if (typeof setupDragDrop === 'function') setupDragDrop();
+    if (typeof switchAudioWeek === 'function') switchAudioWeek(currentWeek);
 };
