@@ -407,7 +407,7 @@
         #pdf-overlay.active { opacity: 1; pointer-events: all; }
 
         #pdf-drawer {
-            position: fixed; top: 56px; right: 0; bottom: 0;
+            position: fixed; top: 0px; right: 0; bottom: 0;
             width: 620px; max-width: 90vw;
             background: var(--surface); border-left: 1px solid var(--border);
             z-index: 150; display: flex; flex-direction: column;
